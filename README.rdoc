@@ -1,0 +1,5 @@
+= TypeArray - Ruby implementation of the ECMAScript spec ( http://wiki.ecmascript.org/doku.php?id=strawman:typed_arrays )
+
+(c) 2012 Lourens Naudé (methodmissing)
+
+  http://github.com/methodmissing/type_array
