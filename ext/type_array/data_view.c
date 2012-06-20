@@ -39,12 +39,10 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
         if (!NIL_P(byte_length)) {
             Check_Type(byte_length, T_FIXNUM);
             view->byte_length = FIX2ULONG(byte_length);
-            if (view->byte_length < 0) rb_raise(rb_eRangeError, "Length out of range.");
         }
         if (!NIL_P(byte_offset)) {
             Check_Type(byte_offset, T_FIXNUM);
             view->byte_offset = FIX2ULONG(byte_offset);
-            if (view->byte_offset < 0) rb_raise(rb_eRangeError, "Byte offset out of range.");
             if (view->byte_offset % view->byte_length != 0) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
         }
         if ((view->byte_offset + view->byte_length) > view->byte_length)

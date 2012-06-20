@@ -45,7 +45,7 @@ double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
     { \
         char buf[sizeof(type)]; \
         type val; \
-        memmove(buf, (char *)(abuf + index), sizeof(type)); \
+        memmove(buf, (char *)abuf + index, sizeof(type)); \
         if (swiz) rb_type_array_swizzle(buf, sizeof(type)); \
         memmove(&val, buf, sizeof(type)); \
         return val; \
@@ -57,7 +57,7 @@ double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
         char buf[sizeof(type)]; \
         memmove(buf, &val, sizeof(type)); \
         if (swiz) rb_type_array_swizzle(buf, sizeof(type)); \
-        memmove((char *)(abuf + index), buf, sizeof(type)); \
+        memmove((char *)abuf + index, buf, sizeof(type)); \
     }
 
 #define DefineTypeAccessor(name, type) \

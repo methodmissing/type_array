@@ -20,7 +20,6 @@ typedef struct {
     rb_scan_args(argc, argv, "21", &offset, &item, &little_endian); \
     if (NIL_P(little_endian)) little_endian = Qfalse; \
     byte_offset = FIX2ULONG(offset); \
-    if (offset < 0) rb_raise(rb_eRangeError, "Offset may not be negative."); \
     if (offset > view->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
 
 #define DataViewAget(obj, idx) \
@@ -31,7 +30,6 @@ typedef struct {
     rb_scan_args(argc, argv, "11", &offset, &little_endian); \
     if (NIL_P(little_endian)) little_endian = Qfalse; \
     byte_offset = FIX2ULONG(offset); \
-    if (offset < 0) rb_raise(rb_eRangeError, "Offset may not be negative."); \
     if (offset > view->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
 
 void _init_data_view();

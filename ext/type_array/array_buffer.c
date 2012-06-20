@@ -20,7 +20,7 @@ VALUE rb_alloc_array_buffer(unsigned long length)
 {
     VALUE buffer;
     rb_array_buffer_t *buf = NULL;
-    if (length < 0) rb_raise(rb_eRangeError, "ArrayBuffer is not a small enough positive integer");
+    if (length == 0) rb_raise(rb_eRangeError, "ArrayBuffer is not a small enough positive integer");
     buffer = Data_Make_Struct(rb_cArrayBuffer, rb_array_buffer_t, 0, rb_free_array_buffer, buf);
     buf->length = length;
     buf->buf = xcalloc(buf->length, 1);
@@ -41,7 +41,7 @@ static VALUE rb_copy_array_buffer(rb_array_buffer_t *source, long begin, long en
     return buffer;
 }
 
-static VALUE rb_array_buffer_s_new(VALUE obj, VALUE len)
+static VALUE rb_array_buffer_s_new(VALUE klass, VALUE len)
 {
     VALUE buffer;
     Check_Type(len, T_FIXNUM);

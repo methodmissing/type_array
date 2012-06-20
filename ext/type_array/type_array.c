@@ -16,7 +16,7 @@ int rb_type_array_assert_alignment(unsigned int val, unsigned int bytes) {
 }
 
 void rb_type_array_swizzle(char* buf, unsigned long len) {
-  int i;
+  unsigned long i;
   for (i = 0; i < len / 2; ++i) {
     char t = buf[i];
     buf[i] = buf[len - i - 1];
@@ -60,7 +60,6 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     array->length = 0;
     if (FIXNUM_P(obj)) { // Length constructor
         array->length = FIX2ULONG(obj);
-        if (array->length < 0) rb_raise(rb_eRangeError, "ArrayBufferView size is not a small enough positive integer.");
         array->byte_length = (array->length * array->size);
         array->buf = rb_alloc_array_buffer(array->byte_length);
     } else if (rb_class_of(obj) == rb_cArrayBuffer) { // ArrayBuffer constructor
@@ -68,14 +67,12 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         if (!NIL_P(byte_offset)) {
             Check_Type(byte_offset, T_FIXNUM);
             array->byte_offset = FIX2ULONG(byte_offset);
-            if (array->byte_offset < 0) rb_raise(rb_eRangeError, "Byte offset out of range.");
             if (!rb_type_array_assert_alignment(array->byte_offset, array->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
         }
         buffer_length = buf->length;
         if (!NIL_P(length)) {
             Check_Type(length, T_FIXNUM);
             array->length = FIX2ULONG(length);
-            if (array->length < 0) rb_raise(rb_eRangeError, "Length out of range.");
             array->byte_length = array->length * array->size;
         } else {
             array->byte_length = buffer_length - array->byte_offset;
