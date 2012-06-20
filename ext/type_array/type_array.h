@@ -19,10 +19,11 @@ typedef struct {
     GetTypeArray(obj); \
     GetArrayBuffer(ary->buf); \
     Check_Type(idx, T_FIXNUM); \
-    index = FIX2ULONG(idx); \
+    index = FIX2ULONG(idx) * ary->size; \
     if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative."); \
-    if (index > ary->length) rb_raise(rb_eRangeError, "Offset out of range."); \
-    if ((ary->size > ary->length - index)) rb_raise(rb_eRangeError, "Offset/length out of range."); \
+    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned."); \
+    if (index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range."); \
+    if (ary->size > (ary->byte_length - index)) rb_raise(rb_eRangeError, "Offset/length out of range."); \
     switch (TYPE(item)) { \
     case T_FIXNUM: \
     case T_BIGNUM: \
@@ -37,10 +38,11 @@ typedef struct {
     GetTypeArray((obj)); \
     GetArrayBuffer(ary->buf); \
     Check_Type(idx, T_FIXNUM); \
-    index = FIX2ULONG(idx); \
+    index = FIX2ULONG(idx) * ary->size; \
     if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative."); \
-    if (index > ary->length) rb_raise(rb_eRangeError, "Offset out of range."); \
-    if (ary->size > (ary->length - index)) rb_raise(rb_eRangeError, "Offset/length out of range."); \
+    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned."); \
+    if (index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range."); \
+    if (ary->size > (ary->byte_length - index)) rb_raise(rb_eRangeError, "Offset/length out of range."); \
 
 void rb_type_array_swizzle(char* buf, unsigned long len);
 void _init_type_array();
