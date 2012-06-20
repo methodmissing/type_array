@@ -91,7 +91,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->byte_length = (array->size * array->length);
         array->buf = rb_alloc_array_buffer(array->byte_length);
     } else {
-        rb_raise(rb_eTypeError, "XXX");
+        rb_raise(rb_eTypeError, "TypeArray constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
     rb_obj_call_init(type_array, 0, NULL);
     return type_array;

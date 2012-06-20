@@ -7,9 +7,15 @@ class TestTypeArray < TypeArrayTestCase
     assert_instance_of Class, TypeArray
   end
 
-  def test_constructor
+  def test_direct_constructor
     assert_raises TypeError do
       TypeArray.new(100)
+    end
+  end
+
+  def test_unsupported_constructor
+    assert_raises TypeError do
+      Int32Array.new(:invalid)
     end
   end
 
