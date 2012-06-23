@@ -70,7 +70,10 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         if (!NIL_P(byte_offset)) {
             Check_Type(byte_offset, T_FIXNUM);
             array->byte_offset = FIX2ULONG(byte_offset);
-            if (!rb_type_array_assert_alignment(array->byte_offset, array->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
+            if (!rb_type_array_assert_alignment(array->byte_offset, array->size)) {
+                xfree(array);
+                rb_raise(rb_eRangeError, "Byte offset is not aligned.");
+            }
         }
         buffer_length = buf->length;
         if (!NIL_P(length)) {
