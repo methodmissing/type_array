@@ -11,7 +11,7 @@ static void rb_free_array_buffer(void *ptr)
 {
     rb_array_buffer_t *buf = (rb_array_buffer_t *)ptr;
     if (buf) {
-        xfree(buf->buf);
+        if (buf->buf) xfree(buf->buf);
         xfree(buf);
         buf = NULL;
     }

@@ -70,10 +70,8 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         if (!NIL_P(byte_offset)) {
             Check_Type(byte_offset, T_FIXNUM);
             array->byte_offset = FIX2ULONG(byte_offset);
-            if (!rb_type_array_assert_alignment(array->byte_offset, array->size)) {
-                xfree(array);
+            if (!rb_type_array_assert_alignment(array->byte_offset, array->size))
                 rb_raise(rb_eRangeError, "Byte offset is not aligned.");
-            }
         }
         buffer_length = buf->length;
         if (!NIL_P(length)) {
@@ -83,14 +81,11 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         } else {
             array->byte_length = buffer_length - array->byte_offset;
         }
-        if ((array->byte_offset + array->byte_length) > buffer_length) {
-            xfree(array);
+        if ((array->byte_offset + array->byte_length) > buffer_length)
             rb_raise(rb_eRangeError, "Byte offset / length is not aligned.");
-        }
         if (array->length == 0) array->length = array->byte_length / array->size;
         if (array->byte_offset > buffer_length || array->byte_offset + array->length > buffer_length ||
              array->byte_offset + array->length * array->size > buffer_length) {
-             xfree(array);
              rb_raise(rb_eRangeError, "Length is out of range.");
         }
         array->buf = obj;
@@ -103,7 +98,6 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
            
         }
     } else {
-        xfree(array);
         rb_raise(rb_eTypeError, "TypeArray constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
     rb_obj_call_init(type_array, 0, NULL);
