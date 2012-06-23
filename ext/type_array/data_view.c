@@ -21,7 +21,10 @@ static void rb_mark_data_view(void *ptr)
 void rb_free_data_view(void *ptr)
 {
     rb_data_view_t *view = (rb_data_view_t *)ptr;
-    if (view) xfree(view);
+    if (view) {
+        xfree(view);
+        view = NULL;
+    }
 }
 
 static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
@@ -45,11 +48,14 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
             view->byte_offset = FIX2ULONG(byte_offset);
             if (view->byte_offset % view->byte_length != 0) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
         }
-        if ((view->byte_offset + view->byte_length) > view->byte_length)
+        if ((view->byte_offset + view->byte_length) > view->byte_length) {
+            xfree(view);
             rb_raise(rb_eRangeError, "Byte offset / length is not aligned.");
+        }
         view->buf = obj;
     } else {
-        rb_raise(rb_eTypeError, "XXX");
+        xfree(view);
+        rb_raise(rb_eTypeError, "DataView constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
     rb_obj_call_init(data_view, 0, NULL);
     return data_view;

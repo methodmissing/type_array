@@ -43,7 +43,10 @@ static void rb_mark_type_array(void *ptr)
 static void rb_free_type_array(void *ptr)
 {
     rb_type_array_t *ary = (rb_type_array_t *)ptr;
-    if (ary) xfree(ary);
+    if (ary) {
+        xfree(ary);
+        ary = NULL;
+    }
 }
 
 static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
@@ -51,7 +54,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     VALUE type_array;
     VALUE obj, byte_offset, length;
     rb_type_array_t *array = NULL;
-    long buffer_length;
+    unsigned long buffer_length, offset;
     if (klass == rb_cTypeArray) rb_raise(rb_eTypeError, "TypeArray cannot be instantiated directly.");
     rb_scan_args(argc, argv, "12", &obj, &byte_offset, &length);
     type_array = Data_Make_Struct(klass, rb_type_array_t, rb_mark_type_array, rb_free_type_array, array);
@@ -77,11 +80,14 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         } else {
             array->byte_length = buffer_length - array->byte_offset;
         }
-        if ((array->byte_offset + array->byte_length) > buffer_length)
+        if ((array->byte_offset + array->byte_length) > buffer_length) {
+            xfree(array);
             rb_raise(rb_eRangeError, "Byte offset / length is not aligned.");
+        }
         if (array->length == 0) array->length = array->byte_length / array->size;
         if (array->byte_offset > buffer_length || array->byte_offset + array->length > buffer_length ||
              array->byte_offset + array->length * array->size > buffer_length) {
+             xfree(array);
              rb_raise(rb_eRangeError, "Length is out of range.");
         }
         array->buf = obj;
@@ -90,7 +96,11 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->length = ary->length;
         array->byte_length = (array->size * array->length);
         array->buf = rb_alloc_array_buffer(array->byte_length);
+        for (offset = 0; offset < array->length; ++offset) {
+           
+        }
     } else {
+        xfree(array);
         rb_raise(rb_eTypeError, "TypeArray constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
     rb_obj_call_init(type_array, 0, NULL);

@@ -13,6 +13,7 @@ static void rb_free_array_buffer(void *ptr)
     if (buf) {
         xfree(buf->buf);
         xfree(buf);
+        buf = NULL;
     }
 }
 
