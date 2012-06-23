@@ -11,9 +11,13 @@ class TestArrayBuffer < TypeArrayTestCase
     buf = ArrayBuffer.new(100)
     assert_instance_of ArrayBuffer, buf
 
-   assert_raises TypeError do
-     ArrayBuffer.new(:symbol)
-   end
+    assert_raises TypeError do
+      ArrayBuffer.new(:symbol)
+    end
+
+    assert_raises RangeError do
+      ArrayBuffer.new(0)
+    end
   end
 
   def test_byte_length
@@ -23,6 +27,19 @@ class TestArrayBuffer < TypeArrayTestCase
 
   def test_slice
     buf = ArrayBuffer.new(100)
+
+    assert_raises TypeError do
+      buf.slice(:invalid)
+    end
+
+    assert_raises TypeError do
+      buf.slice(50, :invalid)
+    end
+
+    assert_raises RangeError do
+      buf.slice(101)
+    end
+
     copy = buf.slice(50)
     assert buf.object_id != copy.object_id
     assert_equal 50, copy.byte_length

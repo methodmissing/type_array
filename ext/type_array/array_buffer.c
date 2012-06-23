@@ -59,12 +59,19 @@ static VALUE rb_array_buffer_byte_length(VALUE obj)
 static VALUE rb_array_buffer_slice(int argc, VALUE *argv, VALUE obj)
 {
     VALUE buffer, begin, end;
-    long b = 0;
-    long e = 0;
+    unsigned long b = 0;
+    unsigned long e = 0;
     GetArrayBuffer(obj);
     rb_scan_args(argc, argv, "11", &begin, &end);
-    if (NIL_P(end)) e = (long)buf->length;
+    Check_Type(begin, T_FIXNUM);
     b = FIX2ULONG(begin);
+    if (NIL_P(end)) {
+        e = buf->length;
+    } else {
+        Check_Type(end, T_FIXNUM);
+        e = FIX2ULONG(end);
+    }
+    if (e > buf->length) rb_raise(rb_eRangeError, "Offset out of range.");
     buffer = rb_copy_array_buffer(buf, b, e);
     return buffer;
 }
