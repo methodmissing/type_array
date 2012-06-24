@@ -69,4 +69,18 @@ class TestTypeArray < TypeArrayTestCase
       Int32Array.new(buf, 84, 20)
     end
   end
+
+  def test_type_array_constructor
+    buf = ArrayBuffer.new(100)
+
+    ary = Int16Array.new(buf)
+    ary[0] = 100
+    ary[1] = 200
+    ary[2] = 300
+
+    ary2 = Int8Array.new(ary)
+    assert_equal 100, ary2[0]
+    assert_equal 200, ary2[1]
+    assert_equal 44, ary2[2]
+  end
 end

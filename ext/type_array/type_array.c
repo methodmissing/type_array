@@ -11,6 +11,9 @@ VALUE rb_cUInt32Array;
 VALUE rb_cFloat32Array;
 VALUE rb_cFloat64Array;
 
+static ID rb_type_array_intern_aget;
+static ID rb_type_array_intern_aset;
+
 int rb_type_array_assert_alignment(unsigned int val, unsigned int bytes) {
   return (val & (bytes - 1)) == 0 ? 1 : 0;
 }
@@ -94,8 +97,11 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->length = ary->length;
         array->byte_length = (array->size * array->length);
         array->buf = rb_alloc_array_buffer(array->byte_length);
+        array->byte_offset = 0;
         for (offset = 0; offset < array->length; ++offset) {
-           
+          VALUE offs = INT2FIX(offset);
+          VALUE val = rb_funcall(obj, rb_type_array_intern_aget, 1, offs);
+          rb_funcall(type_array, rb_type_array_intern_aset, 2, offs, val);
         }
     } else {
         rb_raise(rb_eTypeError, "TypeArray constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
@@ -263,6 +269,9 @@ static VALUE rb_float64_array_aget(VALUE obj, VALUE idx)
 void _init_type_array()
 {
     rb_cTypeArray = rb_define_class("TypeArray", rb_cObject);
+
+    rb_type_array_intern_aget = rb_intern("[]");
+    rb_type_array_intern_aset = rb_intern("[]=");
 
     rb_define_method(rb_cTypeArray, "byte_length", rb_type_array_byte_length, 0);
     rb_define_method(rb_cTypeArray, "length", rb_type_array_length, 0);
