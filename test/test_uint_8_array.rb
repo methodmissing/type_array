@@ -25,10 +25,7 @@ class TestUInt8Array < TypeArrayTestCase
     ary = UInt8Array.new(buf)
     ary[0] = 5
     assert_equal 5, ary[0]
-    assert_equal 5, ary[0]
     assert_equal 0, ary[1]
-    assert_equal 0, ary[1]
-    assert_equal 0, ary[2]
     assert_equal 0, ary[7]
   end
 end

@@ -32,9 +32,8 @@ class TestInt32Array < TypeArrayTestCase
     ary[0] = 112
     ary[3] = 658
     assert_equal 112, ary[0]
-    assert_equal 112, ary[0]
-    assert_equal 658, ary[3]
     assert_equal 658, ary[3]
     assert_equal 0, ary[1]
+    assert_equal 0, ary[10]
   end
 end

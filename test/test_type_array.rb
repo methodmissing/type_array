@@ -45,6 +45,10 @@ class TestTypeArray < TypeArrayTestCase
     assert_raises RangeError do
       Int32Array.new(buf, 13)
     end
+  end
+
+  def test_offset_length_constructor
+    buf = ArrayBuffer.new(100)
 
     ary = Int32Array.new(buf, 20)
     assert_equal 20, ary.length

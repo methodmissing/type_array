@@ -113,7 +113,7 @@ class TestDataView < TypeArrayTestCase
     view = DataView.new(buf)
     assert_equal 0, view.get_float32(1)
     view.set_float32(1, 55.77)
-    assert_equal 55.77, view.get_float32(1)
+    assert_in_delta 55.77, view.get_float32(1), 0.01
   end
 
   def test_float64

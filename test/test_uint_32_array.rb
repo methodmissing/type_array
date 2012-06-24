@@ -25,8 +25,6 @@ class TestUInt32Array < TypeArrayTestCase
     ary = UInt32Array.new(buf)
     ary[0] = 77
     assert_equal 77, ary[0]
-    assert_equal 77, ary[0]
-    assert_equal 0, ary[1]
     assert_equal 0, ary[1]
     assert_equal 0, ary[24]
   end

@@ -26,10 +26,9 @@ class TestFloat64Array < TypeArrayTestCase
     ary = Float64Array.new(buf)
     ary[0] = 77.643
     assert_equal 77.643, ary[0]
-    assert_equal 77.643, ary[0]
     ary[0] = 55.333
     assert_equal 55.333, ary[0]
     assert_equal 0, ary[1]
-    assert_equal 0, ary[1]
+    assert_equal 0, ary[10]
   end
 end
