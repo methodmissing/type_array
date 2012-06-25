@@ -5,3 +5,6 @@
 #ifndef RFLOAT_VALUE
 #define RFLOAT_VALUE(v) (RFLOAT(v)->value)
 #endif
+
+//XXX: 1.8 specific - cover other implementations
+#include "rubyio.h"

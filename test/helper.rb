@@ -15,4 +15,9 @@ class TypeArrayTestCase < Test::Unit::TestCase
       GC.stress = false
     end
   end
+
+  private
+  def file_name
+    File.join(File.dirname(__FILE__), "typed.array")
+  end
 end

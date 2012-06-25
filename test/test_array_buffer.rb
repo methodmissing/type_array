@@ -50,4 +50,35 @@ class TestArrayBuffer < TypeArrayTestCase
     copy = buf.slice(-30, -10)
     assert_equal 20, copy.byte_length
   end
+
+  def test_io
+    buf = ArrayBuffer.new(16)
+
+    f = File.open(file_name, File::CREAT | File::RDWR)
+
+    view = DataView.new(buf)
+    view.set_int8(0, 5)
+    view.set_int8(1, 12)
+    view.set_int16(2, 34)
+    view.set_float64(3, 8323.32)
+
+    view.write(f)
+
+    f.flush
+    assert_equal 16, File.size(file_name)
+
+    buf = ArrayBuffer.read(f, 16)
+
+    view = DataView.new(buf)
+    assert_equal 16, view.byte_length
+
+    assert_equal 5, view.get_int8(0)
+    assert_equal 12, view.get_int8(1)
+    assert_equal 34, view.get_int16(2)
+    assert_equal 8323.32, view.get_float64(3)
+
+    f.close
+  ensure
+    File.unlink(file_name) rescue nil
+  end
 end

@@ -12,7 +12,9 @@ typedef struct {
     if (!buf) rb_raise(rb_eTypeError, "uninitialized ArrayBuffer!");
 
 VALUE rb_alloc_array_buffer(unsigned long length);
+VALUE rb_array_buffer_write(VALUE obj, VALUE io);
 
+VALUE rb_io_rewind(VALUE io);
 void _init_array_buffer();
 
 #endif
