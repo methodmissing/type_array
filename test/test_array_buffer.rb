@@ -46,5 +46,8 @@ class TestArrayBuffer < TypeArrayTestCase
 
     copy = copy.slice(25)
     assert_equal 25, copy.byte_length
+
+    copy = buf.slice(-30, -10)
+    assert_equal 20, copy.byte_length
   end
 end
