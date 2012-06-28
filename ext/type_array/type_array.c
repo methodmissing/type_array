@@ -67,7 +67,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     if (FIXNUM_P(obj)) { // Length constructor
         array->length = FIX2ULONG(obj);
         array->byte_length = (array->length * array->size);
-        array->buf = rb_alloc_array_buffer(array->byte_length);
+        array->buf = rb_alloc_array_buffer(array->byte_length, NULL);
     } else if (rb_class_of(obj) == rb_cArrayBuffer) { // ArrayBuffer constructor
         GetArrayBuffer(obj);
         if (!NIL_P(byte_offset)) {
@@ -96,7 +96,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         GetTypeArray(obj);
         array->length = ary->length;
         array->byte_length = (array->size * array->length);
-        array->buf = rb_alloc_array_buffer(array->byte_length);
+        array->buf = rb_alloc_array_buffer(array->byte_length, NULL);
         array->byte_offset = 0;
         for (offset = 0; offset < array->length; ++offset) {
           VALUE offs = INT2FIX(offset);

@@ -7,7 +7,7 @@ class TestArrayBuffer < TypeArrayTestCase
     assert_instance_of Class, ArrayBuffer
   end
 
-  def test_constructor
+  def test_length_constructor
     buf = ArrayBuffer.new(100)
     assert_instance_of ArrayBuffer, buf
 
@@ -18,6 +18,14 @@ class TestArrayBuffer < TypeArrayTestCase
     assert_raises RangeError do
       ArrayBuffer.new(0)
     end
+  end
+
+  def test_string_constructor
+    str = "01234567"
+    buf = ArrayBuffer.new(str)
+    assert_equal 8, buf.byte_length
+
+    assert_equal str, buf.to_s
   end
 
   def test_byte_length
@@ -51,6 +59,11 @@ class TestArrayBuffer < TypeArrayTestCase
     assert_equal 20, copy.byte_length
   end
 
+  def test_to_s
+    buf = ArrayBuffer.new(16)
+    assert_equal "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000", buf.to_s
+  end
+=begin
   def test_io
     buf = ArrayBuffer.new(16)
 
@@ -81,4 +94,5 @@ class TestArrayBuffer < TypeArrayTestCase
   ensure
     File.unlink(file_name) rescue nil
   end
+=end
 end

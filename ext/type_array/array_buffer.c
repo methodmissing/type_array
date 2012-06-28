@@ -19,7 +19,7 @@ static void rb_free_array_buffer(void *ptr)
     }
 }
 
-VALUE rb_alloc_array_buffer(unsigned long length)
+VALUE rb_alloc_array_buffer(unsigned long length, void *data)
 {
     VALUE buffer;
     rb_array_buffer_t *buf = NULL;
@@ -28,6 +28,7 @@ VALUE rb_alloc_array_buffer(unsigned long length)
     buf->length = length;
     buf->buf = xcalloc(buf->length, 1);
     if (!buf->buf) rb_raise(rb_eRangeError, "Unable to allocate ArrayBuffer");
+    if (data) memmove(data, buf->buf, length);
     rb_obj_call_init(buffer, 0, NULL);
     return buffer;
 }
@@ -38,17 +39,23 @@ static VALUE rb_copy_array_buffer(rb_array_buffer_t *source, long begin, long en
     long length;
     length = (end - begin);
     if (length < 0) length = 0;
-    buffer = rb_alloc_array_buffer(length);
+    buffer = rb_alloc_array_buffer(length, NULL);
     GetArrayBuffer(buffer);
     memmove((source + begin), buf->buf, length);
     return buffer;
 }
 
-static VALUE rb_array_buffer_s_new(VALUE klass, VALUE len)
+static VALUE rb_array_buffer_s_new(VALUE klass, VALUE obj)
 {
     VALUE buffer;
-    Check_Type(len, T_FIXNUM);
-    buffer = rb_alloc_array_buffer(FIX2ULONG(len));
+    if (FIXNUM_P(obj)) { // Length constructor
+        buffer = rb_alloc_array_buffer(FIX2ULONG(obj), NULL);
+    } else if (rb_type(obj) == T_STRING) { // String constructor
+        ArrayBufferEncode(obj);
+        buffer = rb_alloc_array_buffer((unsigned long)RSTRING_LEN(obj), (void *)RSTRING_PTR(obj));
+    } else {
+        rb_raise(rb_eTypeError, "ArrayBuffer constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
+    }
     return buffer;
 }
 
@@ -58,7 +65,7 @@ static VALUE rb_array_buffer_s_read(VALUE klass, VALUE io, VALUE len)
     rb_io_t *fptr;
     Check_Type(len, T_FIXNUM);
     rb_funcall(io, rb_array_buffer_intern_rewind, 0);
-    buffer = rb_alloc_array_buffer(FIX2ULONG(len));
+    buffer = rb_alloc_array_buffer(FIX2ULONG(len), NULL);
     GetArrayBuffer(buffer);
     GetOpenFile(io, fptr);
     rb_io_check_readable(fptr);
@@ -106,6 +113,15 @@ VALUE rb_array_buffer_write(VALUE obj, VALUE io)
     return LONG2NUM(rb_io_fwrite(buf->buf, buf->length, f));
 }
 
+VALUE rb_array_buffer_to_s(VALUE obj)
+{
+    VALUE str;
+    GetArrayBuffer(obj);
+    str = rb_str_new((const char*)buf->buf, buf->length);
+    ArrayBufferEncode(str);
+    return rb_obj_freeze(str);
+}
+
 void _init_array_buffer()
 {
     rb_cArrayBuffer = rb_define_class("ArrayBuffer", rb_cObject);
@@ -118,4 +134,5 @@ void _init_array_buffer()
     rb_define_method(rb_cArrayBuffer, "byte_length", rb_array_buffer_byte_length, 0);
     rb_define_method(rb_cArrayBuffer, "slice", rb_array_buffer_slice, -1);
     rb_define_method(rb_cArrayBuffer, "write", rb_array_buffer_write, 1);
+    rb_define_method(rb_cArrayBuffer, "to_s", rb_array_buffer_to_s, 0);
 }
