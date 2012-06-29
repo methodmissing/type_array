@@ -29,6 +29,14 @@ class TestTypeArray < TypeArrayTestCase
     assert_equal 0, ary.byte_offset
   end
 
+  def test_string_constructor
+    str = "01234567"
+    ary = Int32Array.new(str)
+
+    assert_equal 8, ary.byte_length
+    assert_equal str, ary.to_s
+  end
+
   def test_array_buf_constructor
     buf = ArrayBuffer.new(100)
 

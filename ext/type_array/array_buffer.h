@@ -13,6 +13,7 @@ typedef struct {
 
 VALUE rb_alloc_array_buffer(unsigned long length, void *data);
 VALUE rb_array_buffer_write(VALUE obj, VALUE io);
+VALUE rb_array_buffer_to_s(VALUE obj);
 
 VALUE rb_io_rewind(VALUE io);
 void _init_array_buffer();

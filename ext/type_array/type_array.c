@@ -68,6 +68,11 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->length = FIX2ULONG(obj);
         array->byte_length = (array->length * array->size);
         array->buf = rb_alloc_array_buffer(array->byte_length, NULL);
+    } else if (rb_type(obj) == T_STRING) { // String constructor
+        array->byte_length = (unsigned long)RSTRING_LEN(obj);
+        array->length = (array->byte_length / array->size);
+        ArrayBufferEncode(obj);
+        array->buf = rb_alloc_array_buffer(array->byte_length, (void *)RSTRING_PTR(obj));
     } else if (rb_class_of(obj) == rb_cArrayBuffer) { // ArrayBuffer constructor
         GetArrayBuffer(obj);
         if (!NIL_P(byte_offset)) {
@@ -126,6 +131,12 @@ static VALUE rb_type_array_buffer(VALUE obj)
 {
     GetTypeArray(obj);
     return ary->buf; 
+}
+
+static VALUE rb_type_array_to_s(VALUE obj)
+{
+    GetTypeArray(obj);
+    return rb_array_buffer_to_s(ary->buf); 
 }
 
 static VALUE rb_type_array_byte_offset(VALUE obj)
@@ -284,6 +295,7 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "buffer", rb_type_array_buffer, 0);
     rb_define_method(rb_cTypeArray, "byte_offset", rb_type_array_byte_offset, 0);
     rb_define_method(rb_cTypeArray, "write", rb_type_array_write, 1);
+    rb_define_method(rb_cTypeArray, "to_s", rb_type_array_to_s, 0);
 
     rb_cInt8Array = rb_define_class("Int8Array", rb_cTypeArray);
     rb_cUInt8Array = rb_define_class("UInt8Array", rb_cTypeArray);
