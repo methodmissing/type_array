@@ -92,7 +92,7 @@ class TestTypeArray < TypeArrayTestCase
     assert_equal 44, ary2[2]
   end
 
-  def test_io
+  def test_std_io
     buf = ArrayBuffer.new(16)
 
     f = File.open(file_name, File::CREAT | File::RDWR)
@@ -121,5 +121,34 @@ class TestTypeArray < TypeArrayTestCase
     f.close
   ensure
     File.unlink(file_name) rescue nil
+  end
+
+  def test_socket_io
+    buf = ArrayBuffer.new(16)
+
+    server = TCPServer.new("127.0.0.1", 0)
+    f, port, host, addr = server.addr
+    client = TCPSocket.new("127.0.0.1", port)
+    s = server.accept
+
+    ary = Int32Array.new(buf)
+    ary[0] = 78
+    ary[1] = 43
+    ary[2] = 54
+    ary[3] = 12
+
+    ary.write(client)
+
+    ary = Int32Array.read(s, 16)
+    assert_equal 16, ary.byte_length
+
+    assert_equal 78, ary[0]
+    assert_equal 43, ary[1]
+    assert_equal 54, ary[2]
+    assert_equal 12, ary[3]
+
+    s.close
+  ensure
+    s.close rescue nil
   end
 end

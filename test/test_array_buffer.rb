@@ -98,4 +98,35 @@ class TestArrayBuffer < TypeArrayTestCase
   ensure
     File.unlink(file_name) rescue nil
   end
+
+  def test_socket_io
+    buf = ArrayBuffer.new(16)
+
+    server = TCPServer.new("127.0.0.1", 0)
+    f, port, host, addr = server.addr
+    client = TCPSocket.new("127.0.0.1", port)
+    s = server.accept
+
+    view = DataView.new(buf)
+    view.set_int8(0, 5)
+    view.set_int8(1, 12)
+    view.set_int16(2, 34)
+    view.set_float64(3, 8323.32)
+
+    view.write(client)
+
+    buf = ArrayBuffer.read(s, 16)
+
+    view = DataView.new(buf)
+    assert_equal 16, view.byte_length
+
+    assert_equal 5, view.get_int8(0)
+    assert_equal 12, view.get_int8(1)
+    assert_equal 34, view.get_int16(2)
+    assert_equal 8323.32, view.get_float64(3)
+
+    s.close
+  ensure
+    s.close rescue nil
+  end
 end
