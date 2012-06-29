@@ -243,6 +243,12 @@ static VALUE rb_data_view_write(VALUE obj, VALUE io)
     return rb_array_buffer_write(view->buf, io);
 }
 
+static VALUE rb_data_view_to_s(VALUE obj)
+{
+    GetDataView(obj);
+    return rb_array_buffer_to_s(view->buf);
+}
+
 void _init_data_view()
 {
     rb_cDataView = rb_define_class("DataView", rb_cObject);
@@ -252,6 +258,7 @@ void _init_data_view()
     rb_define_method(rb_cDataView, "byte_offset", rb_data_view_byte_offset, 0);
     rb_define_method(rb_cDataView, "buffer", rb_data_view_buffer, 0);
     rb_define_method(rb_cDataView, "write", rb_data_view_write, 1);
+    rb_define_method(rb_cDataView, "to_s", rb_data_view_to_s, 0);
 
     rb_define_method(rb_cDataView, "set_int8", rb_data_view_set_int8, 2);
     rb_define_method(rb_cDataView, "set_uint8", rb_data_view_set_uint8, 2);

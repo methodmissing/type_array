@@ -53,6 +53,15 @@ class TestDataView < TypeArrayTestCase
     assert_equal 15, view.byte_offset
   end
 
+  def test_to_s
+    buf = ArrayBuffer.new(8)
+
+    view = DataView.new(buf)
+    str = view.to_s
+    assert_equal "\x00\x00\x00\x00\x00\x00\x00\x00", str
+    assert str.frozen?
+  end
+
   def test_int8
     buf = ArrayBuffer.new(100)
 
