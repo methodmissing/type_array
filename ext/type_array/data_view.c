@@ -32,7 +32,7 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
     VALUE data_view;
     unsigned long new_byte_length;
     rb_data_view_t *view = NULL;
-    VALUE obj, byte_offset, byte_length;
+    VALUE obj, byte_offset, byte_length, buffer;
     new_byte_length = 0;
     rb_scan_args(argc, argv, "12", &obj, &byte_offset, &byte_length);
     data_view = Data_Make_Struct(klass, rb_data_view_t, rb_mark_data_view, rb_free_data_view, view);
@@ -41,26 +41,32 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
     if (rb_class_of(obj) == rb_cArrayBuffer) { // ArrayBuffer constructor
         GetArrayBuffer(obj);
         view->byte_length = buf->length;
-        if (!NIL_P(byte_offset)) {
-            Check_Type(byte_offset, T_FIXNUM);
-            view->byte_offset = FIX2ULONG(byte_offset);
-            if (view->byte_offset >= view->byte_length)
-                rb_raise(rb_eRangeError, "Byte offset out of range.");
-        }
-        if (!NIL_P(byte_length)) {
-            Check_Type(byte_length, T_FIXNUM);
-            new_byte_length = FIX2ULONG(byte_length);
-            if (new_byte_length > view->byte_length)
-                rb_raise(rb_eRangeError, "Byte length out of range.");
-            if ((view->byte_offset + new_byte_length) > view->byte_length)
-                rb_raise(rb_eRangeError, "Byte offset / length is not aligned.");
-            view->byte_length = new_byte_length;
-        }
-        view->byte_length -= view->byte_offset;
         view->buf = obj;
+    } else if (rb_type(obj) == T_STRING){
+        ArrayBufferEncode(obj);
+        buffer = rb_alloc_array_buffer((unsigned long)RSTRING_LEN(obj), (void *)RSTRING_PTR(obj));
+        GetArrayBuffer(buffer);
+        view->byte_length = buf->length;
+        view->buf = buffer;
     } else {
         rb_raise(rb_eTypeError, "DataView constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
+    if (!NIL_P(byte_offset)) {
+        Check_Type(byte_offset, T_FIXNUM);
+         view->byte_offset = FIX2ULONG(byte_offset);
+         if (view->byte_offset >= view->byte_length)
+            rb_raise(rb_eRangeError, "Byte offset out of range.");
+    }
+    if (!NIL_P(byte_length)) {
+        Check_Type(byte_length, T_FIXNUM);
+        new_byte_length = FIX2ULONG(byte_length);
+        if (new_byte_length > view->byte_length)
+            rb_raise(rb_eRangeError, "Byte length out of range.");
+        if ((view->byte_offset + new_byte_length) > view->byte_length)
+            rb_raise(rb_eRangeError, "Byte offset / length is not aligned.");
+        view->byte_length = new_byte_length;
+    }
+    view->byte_length -= view->byte_offset;
     rb_obj_call_init(data_view, 0, NULL);
     return data_view;
 }

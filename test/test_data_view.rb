@@ -7,7 +7,7 @@ class TestDataView < TypeArrayTestCase
     assert_instance_of Class, DataView
   end
 
-  def test_default_constructor
+  def test_buffer_constructor
     buf = ArrayBuffer.new(100)
 
     assert_raises TypeError do
@@ -31,6 +31,13 @@ class TestDataView < TypeArrayTestCase
     assert_equal 100, view.byte_length
     assert_equal 0, view.byte_offset
     assert_equal buf, view.buffer
+  end
+
+  def test_string_constructor
+    str = "01234567"
+    view = DataView.new(str)
+    assert_equal 8, view.byte_length
+    assert_equal str, view.to_s
   end
 
   def test_offset_constructor
