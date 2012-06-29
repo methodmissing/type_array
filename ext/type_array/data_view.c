@@ -243,12 +243,6 @@ static VALUE rb_data_view_get_float64(int argc, VALUE *argv, VALUE obj)
     return rb_float_new(rb_type_array_get_float64(buf->buf, offset, little_endian));
 }
 
-static VALUE rb_data_view_write(VALUE obj, VALUE io)
-{
-    GetDataView(obj);
-    return rb_array_buffer_write(view->buf, io);
-}
-
 static VALUE rb_data_view_to_s(VALUE obj)
 {
     GetDataView(obj);
@@ -263,7 +257,6 @@ void _init_data_view()
     rb_define_method(rb_cDataView, "byte_length", rb_data_view_byte_length, 0);
     rb_define_method(rb_cDataView, "byte_offset", rb_data_view_byte_offset, 0);
     rb_define_method(rb_cDataView, "buffer", rb_data_view_buffer, 0);
-    rb_define_method(rb_cDataView, "write", rb_data_view_write, 1);
     rb_define_method(rb_cDataView, "to_s", rb_data_view_to_s, 0);
 
     rb_define_method(rb_cDataView, "set_int8", rb_data_view_set_int8, 2);

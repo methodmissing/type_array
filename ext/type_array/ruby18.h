@@ -10,7 +10,6 @@
 #define RSTRING_LEN(s) (RSTRING(s)->len)
 #endif
 
-#include "rubyio.h"
 #include "rubysig.h"
 
 #endif

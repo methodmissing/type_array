@@ -5,7 +5,6 @@
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include <ruby/encoding.h>
-#include <ruby/io.h>
 extern rb_encoding *binary_encoding;
 #define ArrayBufferEncode(str) rb_enc_associate(str, binary_encoding)
 #else

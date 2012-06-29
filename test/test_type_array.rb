@@ -91,4 +91,35 @@ class TestTypeArray < TypeArrayTestCase
     assert_equal 200, ary2[1]
     assert_equal 44, ary2[2]
   end
+
+  def test_io
+    buf = ArrayBuffer.new(16)
+
+    f = File.open(file_name, File::CREAT | File::RDWR)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 78
+    ary[1] = 43
+    ary[2] = 54
+    ary[3] = 12
+
+    ary.write(f)
+
+    f.flush
+    assert_equal 16, File.size(file_name)
+
+    f.rewind
+
+    ary = Int32Array.read(f, 16)
+    assert_equal 16, ary.byte_length
+
+    assert_equal 78, ary[0]
+    assert_equal 43, ary[1]
+    assert_equal 54, ary[2]
+    assert_equal 12, ary[3]
+
+    f.close
+  ensure
+    File.unlink(file_name) rescue nil
+  end
 end

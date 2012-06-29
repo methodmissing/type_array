@@ -2,8 +2,6 @@
 
 VALUE rb_cArrayBuffer;
 
-static ID rb_array_buffer_intern_rewind;
-
 /*
  * :nodoc:
  *  GC free callback
@@ -28,7 +26,7 @@ VALUE rb_alloc_array_buffer(unsigned long length, void *data)
     buf->length = length;
     buf->buf = xcalloc(buf->length, 1);
     if (!buf->buf) rb_raise(rb_eRangeError, "Unable to allocate ArrayBuffer");
-    if (data) memmove(data, buf->buf, length);
+    if (data) memmove(buf->buf, data, length);
     rb_obj_call_init(buffer, 0, NULL);
     return buffer;
 }
@@ -56,21 +54,6 @@ static VALUE rb_array_buffer_s_new(VALUE klass, VALUE obj)
     } else {
         rb_raise(rb_eTypeError, "ArrayBuffer constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
-    return buffer;
-}
-
-static VALUE rb_array_buffer_s_read(VALUE klass, VALUE io, VALUE len)
-{
-    VALUE buffer;
-    rb_io_t *fptr;
-    Check_Type(len, T_FIXNUM);
-    rb_funcall(io, rb_array_buffer_intern_rewind, 0);
-    buffer = rb_alloc_array_buffer(FIX2ULONG(len), NULL);
-    GetArrayBuffer(buffer);
-    GetOpenFile(io, fptr);
-    rb_io_check_readable(fptr);
-    FILE *f = GetReadFile(fptr);
-    rb_io_fread((char *)buf->buf, (long)buf->length, f);
     return buffer;
 }
 
@@ -103,16 +86,6 @@ static VALUE rb_array_buffer_slice(int argc, VALUE *argv, VALUE obj)
     return buffer;
 }
 
-VALUE rb_array_buffer_write(VALUE obj, VALUE io)
-{
-    rb_io_t *fptr;
-    GetArrayBuffer(obj);
-    GetOpenFile(io, fptr);
-    rb_io_check_writable(fptr);
-    FILE *f = GetWriteFile(fptr);
-    return LONG2NUM(rb_io_fwrite(buf->buf, buf->length, f));
-}
-
 VALUE rb_array_buffer_to_s(VALUE obj)
 {
     VALUE str;
@@ -126,13 +99,9 @@ void _init_array_buffer()
 {
     rb_cArrayBuffer = rb_define_class("ArrayBuffer", rb_cObject);
 
-    rb_array_buffer_intern_rewind = rb_intern("rewind");
-
     rb_define_singleton_method(rb_cArrayBuffer, "new", rb_array_buffer_s_new, 1);
-    rb_define_singleton_method(rb_cArrayBuffer, "read", rb_array_buffer_s_read, 2);
 
     rb_define_method(rb_cArrayBuffer, "byte_length", rb_array_buffer_byte_length, 0);
     rb_define_method(rb_cArrayBuffer, "slice", rb_array_buffer_slice, -1);
-    rb_define_method(rb_cArrayBuffer, "write", rb_array_buffer_write, 1);
     rb_define_method(rb_cArrayBuffer, "to_s", rb_array_buffer_to_s, 0);
 }

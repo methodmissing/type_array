@@ -63,12 +63,9 @@ class TestArrayBuffer < TypeArrayTestCase
     buf = ArrayBuffer.new(16)
     str = buf.to_s
     assert_equal "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000", str
-
-    assert_raises RuntimeError do
-      str.slice!(1..2)
-    end
+    assert str.frozen?
   end
-=begin
+
   def test_io
     buf = ArrayBuffer.new(16)
 
@@ -85,6 +82,8 @@ class TestArrayBuffer < TypeArrayTestCase
     f.flush
     assert_equal 16, File.size(file_name)
 
+    f.rewind
+
     buf = ArrayBuffer.read(f, 16)
 
     view = DataView.new(buf)
@@ -99,5 +98,4 @@ class TestArrayBuffer < TypeArrayTestCase
   ensure
     File.unlink(file_name) rescue nil
   end
-=end
 end

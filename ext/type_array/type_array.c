@@ -277,12 +277,6 @@ static VALUE rb_float64_array_aget(VALUE obj, VALUE idx)
     return rb_float_new(rb_type_array_get_float64(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN));
 }
 
-static VALUE rb_type_array_write(VALUE obj, VALUE io)
-{
-    GetTypeArray(obj);
-    return rb_array_buffer_write(ary->buf, io);
-}
-
 void _init_type_array()
 {
     rb_cTypeArray = rb_define_class("TypeArray", rb_cObject);
@@ -294,7 +288,6 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "length", rb_type_array_length, 0);
     rb_define_method(rb_cTypeArray, "buffer", rb_type_array_buffer, 0);
     rb_define_method(rb_cTypeArray, "byte_offset", rb_type_array_byte_offset, 0);
-    rb_define_method(rb_cTypeArray, "write", rb_type_array_write, 1);
     rb_define_method(rb_cTypeArray, "to_s", rb_type_array_to_s, 0);
 
     rb_cInt8Array = rb_define_class("Int8Array", rb_cTypeArray);
