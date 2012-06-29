@@ -61,7 +61,12 @@ class TestArrayBuffer < TypeArrayTestCase
 
   def test_to_s
     buf = ArrayBuffer.new(16)
-    assert_equal "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000", buf.to_s
+    str = buf.to_s
+    assert_equal "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000", str
+
+    assert_raises RuntimeError do
+      str.slice!(1..2)
+    end
   end
 =begin
   def test_io
