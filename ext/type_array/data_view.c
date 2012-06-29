@@ -42,7 +42,7 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
         GetArrayBuffer(obj);
         view->byte_length = buf->length;
         view->buf = obj;
-    } else if (rb_type(obj) == T_STRING){
+    } else if (rb_type(obj) == T_STRING){ // String constructor
         ArrayBufferEncode(obj);
         buffer = rb_alloc_array_buffer((unsigned long)RSTRING_LEN(obj), (void *)RSTRING_PTR(obj));
         GetArrayBuffer(buffer);
