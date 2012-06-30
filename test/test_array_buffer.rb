@@ -103,7 +103,7 @@ class TestArrayBuffer < TypeArrayTestCase
     buf = ArrayBuffer.new(16)
 
     server = TCPServer.new("127.0.0.1", 0)
-    f, port, host, addr = server.addr
+    port = server.addr[1]
     client = TCPSocket.new("127.0.0.1", port)
     s = server.accept
 
