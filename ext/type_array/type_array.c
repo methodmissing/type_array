@@ -14,7 +14,7 @@ VALUE rb_cFloat64Array;
 static ID rb_type_array_intern_aget;
 static ID rb_type_array_intern_aset;
 
-int rb_type_array_assert_alignment(unsigned int val, unsigned int bytes) {
+int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes) {
   return (val & (bytes - 1)) == 0 ? 1 : 0;
 }
 
