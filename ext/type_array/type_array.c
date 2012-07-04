@@ -168,11 +168,24 @@ static inline VALUE rb_type_array_coerce(VALUE obj, void *val)
     }
 }
 
-static VALUE rb_int8_array_aset(VALUE obj, VALUE idx, VALUE item)
+inline long rb_type_array_aset(VALUE obj, VALUE idx, rb_type_array_t *ary, VALUE item)
 {
-    TypeArrayAset(obj, idx, item);
-    rb_type_array_set_int8(buf->buf, index, NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return Qnil;
+    long index;
+    Check_Type(idx, T_FIXNUM);
+    index = FIX2LONG(idx) * ary->size;
+    if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative.");
+    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
+    if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
+    if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range.");
+    switch (TYPE(item)) {
+    case T_FIXNUM:
+    case T_BIGNUM:
+    case T_FLOAT:
+        break;
+    default:
+        rb_raise(rb_eTypeError, "Type arrays only support Fixnum, Bignum and Float instances");
+    }
+    return index;
 }
 
 inline long rb_type_array_aget(VALUE obj, VALUE idx, rb_type_array_t *ary)
@@ -187,6 +200,15 @@ inline long rb_type_array_aget(VALUE obj, VALUE idx, rb_type_array_t *ary)
     return index;
 }
 
+static VALUE rb_int8_array_aset(VALUE obj, VALUE idx, VALUE item)
+{
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
+    rb_type_array_set_int8(buf->buf, index, NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
+    return Qnil;
+}
+
 static VALUE rb_int8_array_aget(VALUE obj, VALUE idx)
 {
     GetTypeArray((obj));
@@ -198,7 +220,9 @@ static VALUE rb_int8_array_aget(VALUE obj, VALUE idx)
 
 static VALUE rb_uint8_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     rb_type_array_set_uint8(buf->buf, index, (unsigned char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return Qnil;
 }
@@ -214,7 +238,9 @@ static VALUE rb_uint8_array_aget(VALUE obj, VALUE idx)
 
 static VALUE rb_int16_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     rb_type_array_set_int16(buf->buf, index, (short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return Qnil;
 }
@@ -230,7 +256,9 @@ static VALUE rb_int16_array_aget(VALUE obj, VALUE idx)
 
 static VALUE rb_uint16_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     rb_type_array_set_uint16(buf->buf, index, (unsigned short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return Qnil;
 }
@@ -246,7 +274,9 @@ static VALUE rb_uint16_array_aget(VALUE obj, VALUE idx)
 
 static VALUE rb_int32_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     rb_type_array_set_int32(buf->buf, index, NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return Qnil;
 }
@@ -262,7 +292,9 @@ static VALUE rb_int32_array_aget(VALUE obj, VALUE idx)
 
 static VALUE rb_uint32_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     rb_type_array_set_uint32(buf->buf, index, NUM2UINT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return Qnil;
 }
@@ -279,7 +311,9 @@ static VALUE rb_uint32_array_aget(VALUE obj, VALUE idx)
 static VALUE rb_float32_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
     float val;
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     switch (TYPE(item)) {
       case T_FIXNUM:
           val = (float)FIX2LONG(item);
@@ -309,7 +343,9 @@ static VALUE rb_float32_array_aget(VALUE obj, VALUE idx)
 static VALUE rb_float64_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
     double val;
-    TypeArrayAset(obj, idx, item);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aset(obj, idx, ary, item);
     switch (TYPE(item)) {
       case T_FIXNUM:
           val = (double)FIX2LONG(item);
