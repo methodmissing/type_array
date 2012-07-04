@@ -33,17 +33,7 @@ typedef struct {
         rb_raise(rb_eTypeError, "Type arrays only support Fixnum, Bignum and Float instances"); \
     }
 
-#define TypeArrayAget(obj, idx) \
-    long index; \
-    GetTypeArray((obj)); \
-    GetArrayBuffer(ary->buf); \
-    Check_Type(idx, T_FIXNUM); \
-    index = FIX2LONG(idx) * ary->size; \
-    if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative."); \
-    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned."); \
-    if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range."); \
-    if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range."); \
-
+inline long rb_type_array_aget(VALUE obj, VALUE idx, rb_type_array_t *ary);
 void rb_type_array_swizzle(char* buf, unsigned long len);
 void _init_type_array();
 

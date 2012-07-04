@@ -115,6 +115,8 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     return type_array;
 }
 
+
+
 static VALUE rb_type_array_byte_length(VALUE obj)
 {
     GetTypeArray(obj);
@@ -173,9 +175,23 @@ static VALUE rb_int8_array_aset(VALUE obj, VALUE idx, VALUE item)
     return Qnil;
 }
 
+inline long rb_type_array_aget(VALUE obj, VALUE idx, rb_type_array_t *ary)
+{
+    long index;
+    Check_Type(idx, T_FIXNUM);
+    index = FIX2LONG(idx) * ary->size;
+    if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative.");
+    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
+    if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
+    if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range.");
+    return index;
+}
+
 static VALUE rb_int8_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     char v = rb_type_array_get_int8(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
@@ -189,7 +205,9 @@ static VALUE rb_uint8_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_uint8_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     unsigned char v = rb_type_array_get_uint8(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
@@ -203,7 +221,9 @@ static VALUE rb_int16_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_int16_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     short v = rb_type_array_get_int16(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
@@ -217,7 +237,9 @@ static VALUE rb_uint16_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_uint16_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     unsigned short v = rb_type_array_get_uint16(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
@@ -231,7 +253,9 @@ static VALUE rb_int32_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_int32_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     int v = rb_type_array_get_int32(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
@@ -245,7 +269,9 @@ static VALUE rb_uint32_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_uint32_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     unsigned int v = rb_type_array_get_uint32(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN); 
     return rb_type_array_coerce(obj, &v);
 }
@@ -273,7 +299,9 @@ static VALUE rb_float32_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_float32_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     float v = rb_type_array_get_float32(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
@@ -301,7 +329,9 @@ static VALUE rb_float64_array_aset(VALUE obj, VALUE idx, VALUE item)
 
 static VALUE rb_float64_array_aget(VALUE obj, VALUE idx)
 {
-    TypeArrayAget(obj, idx);
+    GetTypeArray((obj));
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_aget(obj, idx, ary);
     double v = rb_type_array_get_float64(buf->buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_type_array_coerce(obj, &v);
 }
