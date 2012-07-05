@@ -1,5 +1,13 @@
 #include <type_array_ext.h>
 
+/*
+ * :nodoc:
+ *  Provides a low level view of a given ArrayBuffer instance. This is useful for lower level manipulation of byte streams
+ *  and well suited for reading and writing structs / records from and to streams. Expect this to support structs in the
+ *  near future. DataView object's underlying buffer's fixed as well - there's no way to manipulate it from Ruby.
+ *
+*/
+
 VALUE rb_cDataView;
 
 /*
@@ -33,6 +41,28 @@ void rb_free_data_view(void *ptr)
 #endif
 }
 
+/*
+ *  call-seq:
+ *     DataView.new(buf)                =>  DataView
+ *     DataView.new("buffer")           =>  DataView
+ *
+ *  Creates a new DataView instance. Both ArrayBuffer and data (String) constructors are supported.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(8)         =>  ArrayBuffer
+ *     view = DataView.new(buf)         =>  DataView
+ *
+ *     view = DataView.new(buf, 2)      =>  DataView
+ *     view.byte_offset                 => 2
+ *     view.byte_length                 => 6
+ *
+ *     view = DataView.new(buf, 2, 4)   =>  DataView
+ *     view.byte_offset                 => 2
+ *     view.byte_length                 => 2
+ *
+ *     view = DataView.new("buffer")    =>  DataView
+ *
+*/
 static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
 {
     VALUE data_view;
@@ -77,24 +107,73 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
     return data_view;
 }
 
+/*
+ *  call-seq:
+ *     view.byte_length                =>  Fixnum
+ *
+ *  Returns the size of the underlying buffer managed by this DataView instance.
+ *
+ * === Examples
+ *     view = DataView.new("buffer")   =>  DataView
+ *     view.byte_length                =>  6
+ *
+*/
 static VALUE rb_data_view_byte_length(VALUE obj)
 {
     GetDataView(obj);
     return ULONG2NUM(view->byte_length);
 }
 
+/*
+ *  call-seq:
+ *     view.byte_offset                  =>  Fixnum
+ *
+ *  Returns the offset into the underlying buffer managed by this DataView instance.
+ *
+ * === Examples
+ *     view = DataView.new("buffer")     =>  DataView
+ *     view.byte_offset                  =>  0
+ *
+ *     view = DataView.new("buffer", 2)  =>  DataView
+ *     view.byte_offset                  =>  2
+ *
+*/
 static VALUE rb_data_view_byte_offset(VALUE obj)
 {
     GetDataView(obj);
     return ULONG2NUM(view->byte_offset);
 }
 
+/*
+ *  call-seq:
+ *     view.buffer                     =>  String
+ *
+ *  Returns the underlying buffer managed by this DataView instance.
+ *
+ * === Examples
+ *     view = DataView.new("buffer")   =>  DataView
+ *     view.buffer                     =>  ArrayBuffer
+ *
+*/
 static VALUE rb_data_view_buffer(VALUE obj)
 {
     GetDataView(obj);
     return view->buf; 
 }
 
+/*
+ *  call-seq:
+ *     view.set_int8(2, 2)         =>  nil
+ *
+ *  Sets an int8 value at a given offset
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_int8(2, 5)         =>  nil
+ *     view.set_int8(3, -3)        =>  nil
+ *
+*/
 static VALUE rb_data_view_set_int8(VALUE obj, VALUE offset_, VALUE item_)
 {
     int argc;
@@ -108,6 +187,19 @@ static VALUE rb_data_view_set_int8(VALUE obj, VALUE offset_, VALUE item_)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_int8(2)            =>  Fixnum
+ *
+ *  Gets an int8 value from a given offset
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_int8(2, 5)         =>  nil
+ *     view.get_int8(2)            =>  5
+ *
+*/
 static VALUE rb_data_view_get_int8(VALUE obj, VALUE offset_)
 {
     int argc;
@@ -119,6 +211,18 @@ static VALUE rb_data_view_get_int8(VALUE obj, VALUE offset_)
     return CHR2FIX(rb_type_array_get_int8(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_uint8(2, 2)        =>  nil
+ *
+ *  Sets an unsigned int8 value at a given offset.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_uint8(2, 5)        =>  nil
+ *
+*/
 static VALUE rb_data_view_set_uint8(VALUE obj, VALUE offset_, VALUE item_)
 {
     int argc;
@@ -132,6 +236,19 @@ static VALUE rb_data_view_set_uint8(VALUE obj, VALUE offset_, VALUE item_)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_uint8(2)           =>  Fixnum
+ *
+ *  Gets an unsigned int8 value from a given offset.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_uint8(2, 5)        =>  nil
+ *     view.get_uint8(2)           =>  5
+ *
+*/
 static VALUE rb_data_view_get_uint8(VALUE obj, VALUE offset_)
 {
     int argc;
@@ -143,6 +260,19 @@ static VALUE rb_data_view_get_uint8(VALUE obj, VALUE offset_)
     return CHR2FIX(rb_type_array_get_uint8(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_int16(2, 20)       =>  nil
+ *
+ *  Sets an int16 value at a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_int16(2, 20)       =>  nil
+ *     view.set_int16(3, -2)       =>  nil
+ *
+*/
 static VALUE rb_data_view_set_int16(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAset(obj, idx);
@@ -150,12 +280,37 @@ static VALUE rb_data_view_set_int16(int argc, VALUE *argv, VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_int16(2)           =>  Fixnum
+ *
+ *  Gets an int16 value from a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_int16(2, 20)       =>  nil
+ *     view.get_int16(2)           =>  20
+ *
+*/
 static VALUE rb_data_view_get_int16(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAget(obj, idx);
     return INT2FIX(rb_type_array_get_int16(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_uint16(2, 20)      =>  nil
+ *
+ *  Sets an unsigned int16 value at a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_uint16(2, 20)      =>  nil
+ *
+*/
 static VALUE rb_data_view_set_uint16(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAset(obj, idx);
@@ -163,12 +318,38 @@ static VALUE rb_data_view_set_uint16(int argc, VALUE *argv, VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_uint16(2)          =>  Fixnum
+ *
+ *  Gets an unsigned int16 value from a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_uint16(2, 20)      =>  nil
+ *     view.get_uint16(2)          =>  20
+ *
+*/
 static VALUE rb_data_view_get_uint16(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAget(obj, idx);
     return INT2FIX(rb_type_array_get_uint16(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_int32(2, 658)      =>  nil
+ *
+ *  Sets an int32 value at a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_int32(2, 758)      =>  nil
+ *     view.set_int32(3, -23)      =>  nil
+ *
+*/
 static VALUE rb_data_view_set_int32(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAset(obj, idx);
@@ -176,12 +357,37 @@ static VALUE rb_data_view_set_int32(int argc, VALUE *argv, VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_int32(2)           =>  Fixnum
+ *
+ *  Gets an int32 value from a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_int32(2, 758)      =>  nil
+ *     view.get_int32(2)           =>  758
+ *
+*/
 static VALUE rb_data_view_get_int32(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAget(obj, idx);
     return INT2FIX(rb_type_array_get_int32(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_uint32(2, 20)      =>  nil
+ *
+ *  Sets an unsigned int32 value at a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_uint32(2, 758)     =>  nil
+ *
+*/
 static VALUE rb_data_view_set_uint32(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAset(obj, idx);
@@ -189,12 +395,37 @@ static VALUE rb_data_view_set_uint32(int argc, VALUE *argv, VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_uint32(2)          =>  Fixnum
+ *
+ *  Gets an unsigned int32 value from a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_uint32(2, 758)     =>  nil
+ *     view.get_uint32(2)          =>  758
+ *
+*/
 static VALUE rb_data_view_get_uint32(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAget(obj, idx);
     return INT2FIX(rb_type_array_get_uint32(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_float32(2, 0.775)   =>  nil
+ *
+ *  Sets a float32 value at a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)  => ArrayBuffer
+ *     view = DataView.new(buf)    =>  DataView
+ *     view.set_float32(2, 0.775)  =>  nil
+ *
+*/
 static VALUE rb_data_view_set_float32(int argc, VALUE *argv, VALUE obj)
 {
     float val;
@@ -216,12 +447,37 @@ static VALUE rb_data_view_set_float32(int argc, VALUE *argv, VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_float32(2)          =>  Float
+ *
+ *  Gets a float32 value from a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)   =>  ArrayBuffer
+ *     view = DataView.new(buf)     =>  DataView
+ *     view.set_float32(2, 77.643)  =>  nil
+ *     view.get_float32(2)          =>  758
+ *
+*/
 static VALUE rb_data_view_get_float32(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAget(obj, idx);
     return rb_float_new((double)rb_type_array_get_float32(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.set_float64(2, 77.643)   =>  nil
+ *
+ *  Sets a float64 value at a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)    =>  ArrayBuffer
+ *     view = DataView.new(buf)      =>  DataView
+ *     view.set_float64(2, 77.643)   =>  nil
+ *
+*/
 static VALUE rb_data_view_set_float64(int argc, VALUE *argv, VALUE obj)
 {
     double val;
@@ -243,12 +499,37 @@ static VALUE rb_data_view_set_float64(int argc, VALUE *argv, VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     view.get_float64(2)          =>  Float
+ *
+ *  Gets a float64 value from a given offset, using the provided endianness.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)   =>  ArrayBuffer
+ *     view = DataView.new(buf)     =>  DataView
+ *     view.set_float64(2, 77.643)  =>  nil
+ *     view.get_float64(2)          =>  758
+ *
+*/
 static VALUE rb_data_view_get_float64(int argc, VALUE *argv, VALUE obj)
 {
     DataViewAget(obj, idx);
     return rb_float_new(rb_type_array_get_float64(buf->buf, offset, little_endian));
 }
 
+/*
+ *  call-seq:
+ *     view.to_s                        =>  String
+ *
+ *  Returns a String (binary) representation of the underlying buffer managed by this DataView instance.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new("buffer")  =>  ArrayBuffer
+ *     view = DataView.new(buf)         =>  DataView
+ *     view.to_s                        =>  "buffer"
+ *
+*/
 static VALUE rb_data_view_to_s(VALUE obj)
 {
     GetDataView(obj);
