@@ -21,10 +21,16 @@ static void rb_mark_data_view(void *ptr)
 void rb_free_data_view(void *ptr)
 {
     rb_data_view_t *view = (rb_data_view_t *)ptr;
+#ifdef TYPE_ARRAY_DEBUG
+    printf(">> rb_free_data_view %p\n", ptr);
+#endif
     if (view) {
         xfree(view);
         view = NULL;
     }
+#ifdef TYPE_ARRAY_DEBUG
+    printf("<< rb_free_data_view %p\n", ptr);
+#endif
 }
 
 static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)

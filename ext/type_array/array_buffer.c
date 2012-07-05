@@ -10,11 +10,17 @@ VALUE rb_cArrayBuffer;
 static void rb_free_array_buffer(void *ptr)
 {
     rb_array_buffer_t *buf = (rb_array_buffer_t *)ptr;
+#ifdef TYPE_ARRAY_DEBUG
+    printf(">> rb_free_array_buffer %p\n", ptr);
+#endif
     if (buf) {
         if (buf->buf) xfree(buf->buf);
         xfree(buf);
         buf = NULL;
     }
+#ifdef TYPE_ARRAY_DEBUG
+    printf("<< rb_free_array_buffer %p\n", ptr);
+#endif
 }
 
 VALUE rb_alloc_array_buffer(unsigned long length, void *data)
@@ -39,7 +45,7 @@ static VALUE rb_copy_array_buffer(rb_array_buffer_t *source, long begin, long en
     if (length < 0) length = 0;
     buffer = rb_alloc_array_buffer(length, NULL);
     GetArrayBuffer(buffer);
-    memmove((source + begin), buf->buf, length);
+    memmove(buf->buf, (source + begin), length);
     return buffer;
 }
 

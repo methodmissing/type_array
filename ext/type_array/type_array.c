@@ -14,73 +14,73 @@ VALUE rb_cFloat64Array;
 static ID rb_type_array_intern_aget;
 static ID rb_type_array_intern_aset;
 
-static void rb_type_array_coerce_to_int8(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_int8(rb_array_buffer_t *buf, long index, VALUE item)
 {
      rb_type_array_set_int8(buf, index, (char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_int8(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_int8(rb_array_buffer_t *buf, long index)
 {
      char val = rb_type_array_get_int8(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
      return CHR2FIX(val);
 }
 
-static void rb_type_array_coerce_to_uint8(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_uint8(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_uint8(buf, index, (unsigned char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_uint8(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_uint8(rb_array_buffer_t *buf, long index)
 {
     unsigned char val = rb_type_array_get_uint8(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return CHR2FIX(val);
 }
 
-static void rb_type_array_coerce_to_int16(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_int16(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_int16(buf, index, (short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_int16(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_int16(rb_array_buffer_t *buf, long index)
 {
     short val = rb_type_array_get_int16(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return INT2FIX(val);
 }
 
-static void rb_type_array_coerce_to_uint16(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_uint16(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_uint16(buf, index, (unsigned short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_uint16(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_uint16(rb_array_buffer_t *buf, long index)
 {
     unsigned short val = rb_type_array_get_uint16(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return INT2FIX(val);
 }
 
-static void rb_type_array_coerce_to_int32(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_int32(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_int32(buf, index, NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_int32(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_int32(rb_array_buffer_t *buf, long index)
 {
     int val = rb_type_array_get_int32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return INT2FIX(val);
 }
 
-static void rb_type_array_coerce_to_uint32(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_uint32(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_uint32(buf, index, NUM2UINT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_uint32(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_uint32(rb_array_buffer_t *buf, long index)
 {
     unsigned int val = rb_type_array_get_uint32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN); 
     return UINT2NUM(val);
 }
 
-static void rb_type_array_coerce_to_float32(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_float32(rb_array_buffer_t *buf, long index, VALUE item)
 {
     float val;
     switch (TYPE(item)) {
@@ -99,13 +99,13 @@ static void rb_type_array_coerce_to_float32(rb_array_buffer_t *buf, long index, 
     rb_type_array_set_float32(buf, index, val, TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_float32(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_float32(rb_array_buffer_t *buf, long index)
 {
     float val = rb_type_array_get_float32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_float_new((double)val);
 }
 
-static void rb_type_array_coerce_to_float64(rb_array_buffer_t *buf, long index, VALUE item)
+static void rb_type_array_aset_float64(rb_array_buffer_t *buf, long index, VALUE item)
 {
     double val;
     switch (TYPE(item)) {
@@ -124,23 +124,23 @@ static void rb_type_array_coerce_to_float64(rb_array_buffer_t *buf, long index, 
     rb_type_array_set_float64(buf, index, val, TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
-static VALUE rb_type_array_coerce_from_float64(rb_array_buffer_t *buf, long index)
+static VALUE rb_type_array_aref_float64(rb_array_buffer_t *buf, long index)
 {
     double val = rb_type_array_get_float64(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_float_new(val);
 }
 
-int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes) {
-  return (val & (bytes - 1)) == 0 ? 1 : 0;
+inline int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes) {
+    return (val & (bytes - 1)) == 0 ? 1 : 0;
 }
 
-void rb_type_array_swizzle(char* buf, unsigned long len) {
-  unsigned long i;
-  for (i = 0; i < len / 2; ++i) {
-    char t = buf[i];
-    buf[i] = buf[len - i - 1];
-    buf[len - i - 1] = t;
-  }
+inline void rb_type_array_swizzle(char* buf, unsigned long len) {
+    unsigned long i;
+    for (i = 0; i < len / 2; ++i) {
+      char t = buf[i];
+      buf[i] = buf[len - i - 1];
+      buf[len - i - 1] = t;
+    }
 }
 
 /*
@@ -162,10 +162,16 @@ static void rb_mark_type_array(void *ptr)
 static void rb_free_type_array(void *ptr)
 {
     rb_type_array_t *ary = (rb_type_array_t *)ptr;
+#ifdef TYPE_ARRAY_DEBUG
+    printf(">> rb_free_type_array %p\n", ptr);
+#endif
     if (ary) {
         xfree(ary);
         ary = NULL;
     }
+#ifdef TYPE_ARRAY_DEBUG
+    printf("<< rb_free_type_array %p\n", ptr);
+#endif
 }
 
 static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
@@ -182,29 +188,29 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     array->length = 0;
 
     if (klass == rb_cInt8Array) {
-        array->c_to_rb = rb_type_array_coerce_from_int8;
-        array->rb_to_c = rb_type_array_coerce_to_int8;
+        array->aref_fn = rb_type_array_aref_int8;
+        array->aset_fn = rb_type_array_aset_int8;
     } else if (klass == rb_cUInt8Array) {
-        array->c_to_rb = rb_type_array_coerce_from_uint8;
-        array->rb_to_c = rb_type_array_coerce_to_uint8;
+        array->aref_fn = rb_type_array_aref_uint8;
+        array->aset_fn = rb_type_array_aset_uint8;
     } else if (klass == rb_cInt16Array) {
-        array->c_to_rb = rb_type_array_coerce_from_int16;
-        array->rb_to_c = rb_type_array_coerce_to_int16;
+        array->aref_fn = rb_type_array_aref_int16;
+        array->aset_fn = rb_type_array_aset_int16;
     } else if (klass == rb_cUInt16Array) {
-        array->c_to_rb = rb_type_array_coerce_from_uint16;
-        array->rb_to_c = rb_type_array_coerce_to_uint16;
+        array->aref_fn = rb_type_array_aref_uint16;
+        array->aset_fn = rb_type_array_aset_uint16;
     } else if (klass == rb_cInt32Array) {
-        array->c_to_rb = rb_type_array_coerce_from_int32;
-        array->rb_to_c = rb_type_array_coerce_to_int32;
+        array->aref_fn = rb_type_array_aref_int32;
+        array->aset_fn = rb_type_array_aset_int32;
     } else if (klass == rb_cUInt32Array) {
-        array->c_to_rb = rb_type_array_coerce_from_uint32;
-        array->rb_to_c = rb_type_array_coerce_to_uint32;
+        array->aref_fn = rb_type_array_aref_uint32;
+        array->aset_fn = rb_type_array_aset_uint32;
     } else if (klass == rb_cFloat32Array) {
-        array->c_to_rb = rb_type_array_coerce_from_float32;
-        array->rb_to_c = rb_type_array_coerce_to_float32;
+        array->aref_fn = rb_type_array_aref_float32;
+        array->aset_fn = rb_type_array_aset_float32;
     } else if (klass == rb_cFloat64Array) {
-        array->c_to_rb = rb_type_array_coerce_from_float64;
-        array->rb_to_c = rb_type_array_coerce_to_float64;
+        array->aref_fn = rb_type_array_aref_float64;
+        array->aset_fn = rb_type_array_aset_float64;
     }
 
     if (FIXNUM_P(obj)) { // Length constructor
@@ -288,7 +294,7 @@ static VALUE rb_type_array_byte_offset(VALUE obj)
     return ULONG2NUM(ary->byte_offset);
 }
 
-inline long rb_type_array_aset0(VALUE idx, rb_type_array_t *ary, VALUE item)
+inline long rb_type_array_aset_offset(VALUE idx, rb_type_array_t *ary, VALUE item)
 {
     long index;
     Check_Type(idx, T_FIXNUM);
@@ -308,7 +314,7 @@ inline long rb_type_array_aset0(VALUE idx, rb_type_array_t *ary, VALUE item)
     return index;
 }
 
-inline long rb_type_array_aget0(VALUE idx, rb_type_array_t *ary)
+inline long rb_type_array_aget_offset(VALUE idx, rb_type_array_t *ary)
 {
     long index;
     Check_Type(idx, T_FIXNUM);
@@ -324,8 +330,8 @@ static VALUE rb_type_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    long index = rb_type_array_aset0(idx, ary, item);
-    ary->rb_to_c(buf->buf, index, item);
+    long index = rb_type_array_aset_offset(idx, ary, item);
+    ary->aset_fn(buf->buf, index, item);
     return Qnil;
 }
 
@@ -333,8 +339,8 @@ static VALUE rb_type_array_aget(VALUE obj, VALUE idx)
 {
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    long index = rb_type_array_aget0(idx, ary);
-    return ary->c_to_rb(buf->buf, index);
+    long index = rb_type_array_aget_offset(idx, ary);
+    return ary->aref_fn(buf->buf, index);
 }
 
 void _init_type_array()
