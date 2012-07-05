@@ -34,6 +34,7 @@ class TestTypeArray < TypeArrayTestCase
     ary = Int32Array.new(str)
 
     assert_equal 8, ary.byte_length
+    assert_equal 2, ary.length
     assert_equal str, ary.to_s
   end
 
