@@ -49,6 +49,7 @@ VALUE rb_alloc_array_buffer(unsigned long length, void *data)
     if (!buf->buf) rb_raise(rb_eRangeError, "Unable to allocate ArrayBuffer");
     if (data) memmove(buf->buf, data, length);
     rb_obj_call_init(buffer, 0, NULL);
+    rb_obj_freeze(buffer);
     return buffer;
 }
 
