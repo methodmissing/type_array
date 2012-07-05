@@ -26,8 +26,12 @@ class TestInt16Array < TypeArrayTestCase
 
     ary = Int16Array.new(buf)
     ary[0] = 12
+    ary[2] = 5000
+    ary[12] = -5
     assert_equal 12, ary[0]
     assert_equal 0, ary[1]
     assert_equal 0, ary[49]
+    assert_equal(-5, ary[12])
+    assert_equal 5000, ary[2]
   end
 end

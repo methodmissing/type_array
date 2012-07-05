@@ -25,8 +25,12 @@ class TestFloat32Array < TypeArrayTestCase
 
     ary = Float32Array.new(buf)
     ary[0] = 0.775
+    ary[2] = 55.77
+    ary[3] = -55.77
     assert_in_delta 0.775, ary[0], 0.01
     assert_equal 0, ary[1]
     assert_equal 0, ary[10]
+    assert_in_delta 55.77, ary[2], 0.01
+    assert_in_delta(-55.77, ary[3], 0.01)
   end
 end

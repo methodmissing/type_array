@@ -30,10 +30,14 @@ class TestInt32Array < TypeArrayTestCase
 
     ary = Int32Array.new(buf)
     ary[0] = 112
+    ary[2] = 50000000
     ary[3] = 658
+    ary[5] = -900
     assert_equal 112, ary[0]
     assert_equal 658, ary[3]
     assert_equal 0, ary[1]
     assert_equal 0, ary[10]
+    assert_equal(-900, ary[5])
+    assert_equal 50000000, ary[2]
   end
 end

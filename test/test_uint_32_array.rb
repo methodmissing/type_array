@@ -24,8 +24,12 @@ class TestUInt32Array < TypeArrayTestCase
 
     ary = UInt32Array.new(buf)
     ary[0] = 77
+    ary[3] = -77
+    ary[2] = 80000000
     assert_equal 77, ary[0]
     assert_equal 0, ary[1]
     assert_equal 0, ary[24]
+    assert_equal(4294967219, ary[3])
+    assert_equal 80000000, ary[2]
   end
 end

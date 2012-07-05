@@ -20,8 +20,10 @@ class TestInt8Array < TypeArrayTestCase
 
     ary = Int8Array.new(buf)
     ary[0] = 3
+    ary[2] = -3
     assert_equal 3, ary[0]
     assert_equal 0, ary[1]
     assert_equal 0, ary[7]
+    assert_equal(-3, ary[2])
   end
 end

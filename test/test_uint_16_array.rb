@@ -24,8 +24,12 @@ class TestUInt16Array < TypeArrayTestCase
 
     ary = UInt16Array.new(buf)
     ary[0] = 9
+    ary[2] = 19264
+    ary[3] = -8
     assert_equal 9, ary[0]
     assert_equal 0, ary[1]
     assert_equal 0, ary[49]
+    assert_equal 65528, ary[3]
+    assert_equal 19264, ary[2]
   end
 end

@@ -27,8 +27,12 @@ class TestFloat64Array < TypeArrayTestCase
     ary[0] = 77.643
     assert_equal 77.643, ary[0]
     ary[0] = 55.333
+    ary[3] = 323233.77
+    ary[4] = -323233.77
     assert_equal 55.333, ary[0]
     assert_equal 0, ary[1]
     assert_equal 0, ary[10]
+    assert_equal 323233.77, ary[3]
+    assert_equal(-323233.77, ary[4])
   end
 end
