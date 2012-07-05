@@ -1,5 +1,13 @@
 #include <type_array_ext.h>
 
+/*
+ * :nodoc:
+ *  Provides a typed interface to a given ArrayBuffer instance. Values will only be coerced according to the type of
+ *  array. Currently coercing to and from Ruby objects are handled through callbacks via function pointers. This may
+ *  change in the short term.
+ *
+*/
+
 VALUE rb_cTypeArray;
 
 VALUE rb_cInt8Array;
@@ -14,72 +22,137 @@ VALUE rb_cFloat64Array;
 static ID rb_type_array_intern_aget;
 static ID rb_type_array_intern_aset;
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to an int8 at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_int8(rb_array_buffer_t *buf, long index, VALUE item)
 {
      rb_type_array_set_int8(buf, index, (char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces an int8 at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_int8(rb_array_buffer_t *buf, long index)
 {
      char val = rb_type_array_get_int8(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
      return CHR2FIX(val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to an unsigned int8 at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_uint8(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_uint8(buf, index, (unsigned char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces an unsigned int8 at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_uint8(rb_array_buffer_t *buf, long index)
 {
     unsigned char val = rb_type_array_get_uint8(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return CHR2FIX(val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to an int16 at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_int16(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_int16(buf, index, (short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces an int16 at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_int16(rb_array_buffer_t *buf, long index)
 {
     short val = rb_type_array_get_int16(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return INT2FIX(val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to an unsigned int16 at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_uint16(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_uint16(buf, index, (unsigned short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces an unsigned int16 at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_uint16(rb_array_buffer_t *buf, long index)
 {
     unsigned short val = rb_type_array_get_uint16(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return INT2FIX(val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to an int32 at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_int32(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_int32(buf, index, NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces an int32 at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_int32(rb_array_buffer_t *buf, long index)
 {
     int val = rb_type_array_get_int32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return INT2FIX(val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to an unsigned int32 at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_uint32(rb_array_buffer_t *buf, long index, VALUE item)
 {
     rb_type_array_set_uint32(buf, index, NUM2UINT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces an unsigned int32 at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_uint32(rb_array_buffer_t *buf, long index)
 {
     unsigned int val = rb_type_array_get_uint32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN); 
     return UINT2NUM(val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to a float32 (float) at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_float32(rb_array_buffer_t *buf, long index, VALUE item)
 {
     float val;
@@ -99,12 +172,22 @@ static void rb_type_array_aset_float32(rb_array_buffer_t *buf, long index, VALUE
     rb_type_array_set_float32(buf, index, val, TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a float32 (float) at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_float32(rb_array_buffer_t *buf, long index)
 {
     float val = rb_type_array_get_float32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_float_new((double)val);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a Ruby object to a float64 (double) at a given offset, according to host endianness.
+ *
+*/
 static void rb_type_array_aset_float64(rb_array_buffer_t *buf, long index, VALUE item)
 {
     double val;
@@ -124,16 +207,31 @@ static void rb_type_array_aset_float64(rb_array_buffer_t *buf, long index, VALUE
     rb_type_array_set_float64(buf, index, val, TYPE_ARRAY_IS_LITTLE_ENDIAN);
 }
 
+/*
+ * :nodoc:
+ *  Coerces a float64 (double) at a given offset to a Ruby object, according to host endianness.
+ *
+*/
 static VALUE rb_type_array_aref_float64(rb_array_buffer_t *buf, long index)
 {
     double val = rb_type_array_get_float64(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
     return rb_float_new(val);
 }
 
+/*
+ * :nodoc:
+ *  Asserts type alignment.
+ *
+*/
 inline int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes) {
     return (val & (bytes - 1)) == 0 ? 1 : 0;
 }
 
+/*
+ * :nodoc:
+ *  Swizzles byte order.
+ *
+*/
 inline void rb_type_array_swizzle(char* buf, unsigned long len) {
     unsigned long i;
     for (i = 0; i < len / 2; ++i) {
@@ -141,6 +239,23 @@ inline void rb_type_array_swizzle(char* buf, unsigned long len) {
       buf[i] = buf[len - i - 1];
       buf[len - i - 1] = t;
     }
+}
+
+/*
+ * :nodoc:
+ *  Validates offset boundaries.
+ *
+*/
+static inline long rb_type_array_assert_offset(rb_type_array_t *ary, VALUE idx)
+{
+    long index;
+    Check_Type(idx, T_FIXNUM);
+    index = FIX2LONG(idx) * ary->size;
+    if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative.");
+    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
+    if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
+    if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range.");
+    return index;
 }
 
 /*
@@ -174,6 +289,42 @@ static void rb_free_type_array(void *ptr)
 #endif
 }
 
+/*
+ *  call-seq:
+ *     Int32Array.new(100)                =>  Int32Array
+ *     Int32Array.new("01234567")         =>  Int32Array
+ *     Int32Array.new(buf, 20)            =>  Int32Array
+ *     Int32Array.new(buf, 0, 20)         =>  Int32Array
+ *     Int32Array.new(buf, 20, 20)        =>  Int32Array
+ *
+ *  Creates a new TypeArray instance. ArrayBuffer, data (String) and length constructors are supported.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(100)         =>  ArrayBuffer
+ *
+ *     ary = Int32Array.new(buf, 20)      =>  Int32Array
+ *     ary.length                         =>  20
+ *     ary.byte_length                    =>  80
+ *     ary.byte_offset                    =>  20
+ *
+ *     ary = Int32Array.new(buf, 0, 20)   =>  Int32Array
+ *     ary.length                         =>  20
+ *     ary.byte_length                    =>  80
+ *     ary.byte_offset                    =>  0
+ *
+ *     ary = Int32Array.new(buf, 20, 20)  =>  Int32Array
+ *     ary.length                         =>  20
+ *     ary.byte_length                    =>  80
+ *     ary.byte_offset                    =>  20
+ *
+ *     ary = Int32Array.new("01234567")   =>  Int32Array
+ *     ary.byte_length                    =>  8
+ *     ary.to_s                           =>  "01234567"
+ *
+ *     ary = Int32Array.new(100)          =>  Int32Array
+ *     ary.length                         =>  100
+ *     ary.byte_length                    =>  400
+*/
 static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
 {
     VALUE type_array;
@@ -264,45 +415,112 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     return type_array;
 }
 
+/*
+ *  call-seq:
+ *     ary.byte_length                   =>  Fixnum
+ *
+ *  Returns the size of the underlying buffer managed by this TypeArray instance.
+ *
+ * === Examples
+ *     ary = Int32Array.new("01234567")  =>  Int32Array
+ *     ary.byte_length                   =>  8
+ *
+*/
 static VALUE rb_type_array_byte_length(VALUE obj)
 {
     GetTypeArray(obj);
     return ULONG2NUM(ary->byte_length);
 }
 
+/*
+ *  call-seq:
+ *     ary.length                        =>  Fixnum
+ *
+ *  Returns the max number of elements this typed array instance can accommodate.
+ *
+ * === Examples
+ *     ary = Int32Array.new("01234567")  =>  Int32Array
+ *     ary.byte_length                   =>  8
+ *     ary.length                        =>  2
+ *
+*/
 static VALUE rb_type_array_length(VALUE obj)
 {
     GetTypeArray(obj);
     return ULONG2NUM(ary->length);
 }
 
+/*
+ *  call-seq:
+ *     ary.buffer                      =>  String
+ *
+ *  Returns the underlying buffer managed by this ArrayBuffer instance.
+ *
+ * === Examples
+ *     ary = Int32Array.new("buffer")  =>  DataView
+ *     ary.buffer                      =>  ArrayBuffer
+ *
+*/
 static VALUE rb_type_array_buffer(VALUE obj)
 {
     GetTypeArray(obj);
     return ary->buf; 
 }
 
+/*
+ *  call-seq:
+ *     art.to_s                         =>  String
+ *
+ *  Returns a String (binary) representation of the underlying buffer managed by this TypeArray instance.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new("buffer")  =>  ArrayBuffer
+ *     ary = Int32Array.new(buf)        =>  Int32Array
+ *     ary.to_s                         =>  "buffer"
+ *
+*/
 static VALUE rb_type_array_to_s(VALUE obj)
 {
     GetTypeArray(obj);
     return rb_array_buffer_to_s(ary->buf); 
 }
 
+/*
+ *  call-seq:
+ *     ary.byte_offset                      =>  Fixnum
+ *
+ *  Returns the offset into the underlying buffer managed by this TypeArray instance.
+ *
+ * === Examples
+ *     ary = Int32Array.new("01234567")     =>  Int32Array
+ *     ary.byte_offset                      =>  0
+ *
+ *     ary = Int32Array.new("01234567", 2)  =>  Int32Array
+ *     ary.byte_offset                      =>  2
+ *
+*/
 static VALUE rb_type_array_byte_offset(VALUE obj)
 {
     GetTypeArray(obj);
     return ULONG2NUM(ary->byte_offset);
 }
 
-inline long rb_type_array_aset_offset(VALUE idx, rb_type_array_t *ary, VALUE item)
+/*
+ *  call-seq:
+ *     ary[1] = 20                       =>  nil
+ *
+ *  Sets a value at a given offset, with coercion dependent on the array type of this instance.
+ *
+ * === Examples
+ *     ary = Int32Array.new("01234567")  =>  Int32Array
+ *     ary[1] = 23                       =>  nil
+ *
+*/
+static VALUE rb_type_array_aset(VALUE obj, VALUE idx, VALUE item)
 {
-    long index;
-    Check_Type(idx, T_FIXNUM);
-    index = FIX2LONG(idx) * ary->size;
-    if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative.");
-    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
-    if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
-    if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range.");
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+    long index = rb_type_array_assert_offset(ary, idx);
     switch (TYPE(item)) {
     case T_FIXNUM:
     case T_BIGNUM:
@@ -311,35 +529,27 @@ inline long rb_type_array_aset_offset(VALUE idx, rb_type_array_t *ary, VALUE ite
     default:
         rb_raise(rb_eTypeError, "Type arrays only support Fixnum, Bignum and Float instances");
     }
-    return index;
-}
-
-inline long rb_type_array_aget_offset(VALUE idx, rb_type_array_t *ary)
-{
-    long index;
-    Check_Type(idx, T_FIXNUM);
-    index = FIX2LONG(idx) * ary->size;
-    if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative.");
-    if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
-    if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
-    if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range.");
-    return index;
-}
-
-static VALUE rb_type_array_aset(VALUE obj, VALUE idx, VALUE item)
-{
-    GetTypeArray(obj);
-    GetArrayBuffer(ary->buf);
-    long index = rb_type_array_aset_offset(idx, ary, item);
     ary->aset_fn(buf->buf, index, item);
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     ary[1]                            =>  Fixnum, Bignum or Float
+ *
+ *  Gets a value at a given offset, with coercion dependent on the array type of this instance.
+ *
+ * === Examples
+ *     ary = Int32Array.new("01234567")  =>  Int32Array
+ *     ary[1] = 23                       =>  nil
+ *     ary[1]                            =>  23
+ *
+*/
 static VALUE rb_type_array_aget(VALUE obj, VALUE idx)
 {
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    long index = rb_type_array_aget_offset(idx, ary);
+    long index = rb_type_array_assert_offset(ary, idx);
     return ary->aref_fn(buf->buf, index);
 }
 
