@@ -1,5 +1,13 @@
 #include <type_array_ext.h>
 
+/*
+ * :nodoc:
+ *  An Array Buffer implementation with a simple query API for it's chunk of managed memory. The buffer is fixed and
+ *  cannot be resized. Data View and Type Array instances manipulate the buffer directly (this may change), but none
+ *  of that's exposed through a Ruby API.
+ *
+*/
+
 VALUE rb_cArrayBuffer;
 
 /*
@@ -23,6 +31,13 @@ static void rb_free_array_buffer(void *ptr)
 #endif
 }
 
+/*
+ * :nodoc:
+ *  Utility function to allocate a new ArrayBuffer instance of given length. An optional pointer to an existing chunk
+ *  of memory may be passed, which becomes the buffer contents. This is useful for reading raw binary data from
+ *  standard I/O or sockets as binary strings.
+ *
+*/
 VALUE rb_alloc_array_buffer(unsigned long length, void *data)
 {
     VALUE buffer;
@@ -37,18 +52,37 @@ VALUE rb_alloc_array_buffer(unsigned long length, void *data)
     return buffer;
 }
 
+/*
+ * :nodoc:
+ *  Utility function to create a new ArrayBuffer instance from a begin..end byte range
+ *
+*/
 static VALUE rb_copy_array_buffer(rb_array_buffer_t *source, long begin, long end)
 {
-    VALUE buffer;
     long length;
+    void *data;
     length = (end - begin);
     if (length < 0) length = 0;
-    buffer = rb_alloc_array_buffer(length, NULL);
-    GetArrayBuffer(buffer);
-    memmove(buf->buf, (source + begin), length);
-    return buffer;
+    data = source + begin;
+    return rb_alloc_array_buffer(length, data);
 }
 
+/*
+ *  call-seq:
+ *     ArrayBuffer.new(8)          =>  ArrayBuffer
+ *     ArrayBuffer.new("buffer")   =>  ArrayBuffer
+ *
+ *  Creates a new ArrayBuffer instance. Both length and data (String) constructors are supported.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(8)         =>  ArrayBuffer
+ *     buf.byte_length                  =>  8
+ *
+ *     buf = ArrayBuffer.new("buffer")  =>  ArrayBuffer
+ *     buf.byte_length                  =>  6
+ *     buf.to_s                         =>  "buffer"
+ *
+*/
 static VALUE rb_array_buffer_s_new(VALUE klass, VALUE obj)
 {
     VALUE buffer;
@@ -63,12 +97,35 @@ static VALUE rb_array_buffer_s_new(VALUE klass, VALUE obj)
     return buffer;
 }
 
+/*
+ *  call-seq:
+ *     buf.byte_length          =>  Fixnum
+ *
+ *  Returns the size of the buffer.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(8)         =>  ArrayBuffer
+ *     buf.byte_length                  =>  8
+ *
+*/
 static VALUE rb_array_buffer_byte_length(VALUE obj)
 {
     GetArrayBuffer(obj);
     return ULONG2NUM(buf->length);   
 }
 
+/*
+ *  call-seq:
+ *     buf.slice(1)         =>  ArrayBuffer
+ *
+ *  Returns a new ArrayBuffer instance with a slice (copy) of a range of memory managed by the source buffer. 
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(8)         =>  ArrayBuffer
+ *     buf.slice(2)                     =>  ArrayBuffer
+ *     buf.slice(4,6)                   =>  ArrayBuffer
+ *
+*/
 static VALUE rb_array_buffer_slice(int argc, VALUE *argv, VALUE obj)
 {
     VALUE buffer, begin, end;
@@ -92,6 +149,18 @@ static VALUE rb_array_buffer_slice(int argc, VALUE *argv, VALUE obj)
     return buffer;
 }
 
+/*
+ *  call-seq:
+ *     buf.to_s          =>  String
+ *
+ *  Returns a String (binary) representation of the buffer.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new("buffer")  =>  ArrayBuffer
+ *     buf.byte_length                  =>  6
+ *     buf.to_s                         =>  "buffer"
+ *
+*/
 VALUE rb_array_buffer_to_s(VALUE obj)
 {
     VALUE str;
