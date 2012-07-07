@@ -18,10 +18,6 @@ extern VALUE rb_cUInt64Array;
 
 extern VALUE rb_cDataView;
 
-#include <array_buffer.h>
-#include <type_array.h>
-#include <data_view.h>
-
 void rb_type_array_set_int8(void *abuf, unsigned long index, char val, VALUE swiz);
 void rb_type_array_set_uint8(void *abuf, unsigned long index, unsigned char val, VALUE swiz);
 void rb_type_array_set_int16(void *abuf, unsigned long index, short val, VALUE swiz);
@@ -63,5 +59,9 @@ double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
 #define DefineTypeAccessor(name, type) \
     DefineTypeSetter(name, type); \
     DefineTypeGetter(name, type);
+
+#include <array_buffer.h>
+#include <type_array.h>
+#include <data_view.h>
 
 #endif

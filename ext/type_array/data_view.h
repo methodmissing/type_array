@@ -23,7 +23,7 @@ typedef struct {
 
 #define DataViewAget(obj) \
     VALUE offset, little_endian; \
-	unsigned long index; \
+    unsigned long index; \
     GetDataView(obj); \
     GetArrayBuffer(view->buf); \
     rb_scan_args(argc, argv, "11", &offset, &little_endian); \

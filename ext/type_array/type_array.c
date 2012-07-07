@@ -27,126 +27,84 @@ static ID rb_type_array_intern_aset;
  *  Coerces a Ruby object to an int8 at a given offset, according to host endianness.
  *
 */
-static void rb_type_array_aset_int8(rb_array_buffer_t *buf, long index, VALUE item)
-{
-     rb_type_array_set_int8(buf, index, (char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-}
+DefineTypeArraySetter(int8, (char)NUM2CHR(item));
 
 /*
  * :nodoc:
  *  Coerces an int8 at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_int8(rb_array_buffer_t *buf, long index)
-{
-     char val = rb_type_array_get_int8(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-     return CHR2FIX(val);
-}
+DefineTypeArrayGetter(int8, char, CHR2FIX(val));
 
 /*
  * :nodoc:
  *  Coerces a Ruby object to an unsigned int8 at a given offset, according to host endianness.
  *
 */
-static void rb_type_array_aset_uint8(rb_array_buffer_t *buf, long index, VALUE item)
-{
-    rb_type_array_set_uint8(buf, index, (unsigned char)NUM2CHR(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-}
+DefineTypeArraySetter(uint8, (unsigned char)NUM2CHR(item));
 
 /*
  * :nodoc:
  *  Coerces an unsigned int8 at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_uint8(rb_array_buffer_t *buf, long index)
-{
-    unsigned char val = rb_type_array_get_uint8(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return CHR2FIX(val);
-}
+DefineTypeArrayGetter(uint8, unsigned char, CHR2FIX(val));
 
 /*
  * :nodoc:
  *  Coerces a Ruby object to an int16 at a given offset, according to host endianness.
  *
 */
-static void rb_type_array_aset_int16(rb_array_buffer_t *buf, long index, VALUE item)
-{
-    rb_type_array_set_int16(buf, index, (short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-}
+DefineTypeArraySetter(int16, (short)NUM2INT(item));
 
 /*
  * :nodoc:
  *  Coerces an int16 at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_int16(rb_array_buffer_t *buf, long index)
-{
-    short val = rb_type_array_get_int16(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return INT2FIX(val);
-}
+DefineTypeArrayGetter(int16, short, INT2FIX(val));
 
 /*
  * :nodoc:
  *  Coerces a Ruby object to an unsigned int16 at a given offset, according to host endianness.
  *
 */
-static void rb_type_array_aset_uint16(rb_array_buffer_t *buf, long index, VALUE item)
-{
-    rb_type_array_set_uint16(buf, index, (unsigned short)NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-}
+DefineTypeArraySetter(uint16, (unsigned short)NUM2INT(item));
 
 /*
  * :nodoc:
  *  Coerces an unsigned int16 at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_uint16(rb_array_buffer_t *buf, long index)
-{
-    unsigned short val = rb_type_array_get_uint16(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return INT2FIX(val);
-}
+DefineTypeArrayGetter(uint16, unsigned short, INT2FIX(val));
 
 /*
  * :nodoc:
  *  Coerces a Ruby object to an int32 at a given offset, according to host endianness.
  *
 */
-static void rb_type_array_aset_int32(rb_array_buffer_t *buf, long index, VALUE item)
-{
-    rb_type_array_set_int32(buf, index, NUM2INT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-}
+DefineTypeArraySetter(int32, NUM2INT(item));
 
 /*
  * :nodoc:
  *  Coerces an int32 at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_int32(rb_array_buffer_t *buf, long index)
-{
-    int val = rb_type_array_get_int32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return INT2FIX(val);
-}
+DefineTypeArrayGetter(int32, int, INT2FIX(val));
 
 /*
  * :nodoc:
  *  Coerces a Ruby object to an unsigned int32 at a given offset, according to host endianness.
  *
 */
-static void rb_type_array_aset_uint32(rb_array_buffer_t *buf, long index, VALUE item)
-{
-    rb_type_array_set_uint32(buf, index, NUM2UINT(item), TYPE_ARRAY_IS_LITTLE_ENDIAN);
-}
+DefineTypeArraySetter(uint32, NUM2UINT(item));
 
 /*
  * :nodoc:
  *  Coerces an unsigned int32 at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_uint32(rb_array_buffer_t *buf, long index)
-{
-    unsigned int val = rb_type_array_get_uint32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN); 
-    return UINT2NUM(val);
-}
+DefineTypeArrayGetter(uint32, unsigned int, UINT2NUM(val));
 
 /*
  * :nodoc:
@@ -177,11 +135,7 @@ static void rb_type_array_aset_float32(rb_array_buffer_t *buf, long index, VALUE
  *  Coerces a float32 (float) at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_float32(rb_array_buffer_t *buf, long index)
-{
-    float val = rb_type_array_get_float32(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return rb_float_new((double)val);
-}
+DefineTypeArrayGetter(float32, float, rb_float_new((double)val));
 
 /*
  * :nodoc:
@@ -212,11 +166,7 @@ static void rb_type_array_aset_float64(rb_array_buffer_t *buf, long index, VALUE
  *  Coerces a float64 (double) at a given offset to a Ruby object, according to host endianness.
  *
 */
-static VALUE rb_type_array_aref_float64(rb_array_buffer_t *buf, long index)
-{
-    double val = rb_type_array_get_float64(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN);
-    return rb_float_new(val);
-}
+DefineTypeArrayGetter(float64, double, rb_float_new(val));
 
 /*
  * :nodoc:

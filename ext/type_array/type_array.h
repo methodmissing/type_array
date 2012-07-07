@@ -19,10 +19,20 @@ typedef struct {
     Data_Get_Struct(obj, rb_type_array_t, ary); \
     if (!ary) rb_raise(rb_eTypeError, "uninitialized TypeArray!");
 
-inline VALUE rb_type_array_coerce(VALUE obj, void *val);
-inline long rb_type_array_aset_offset(VALUE idx, rb_type_array_t *ary, VALUE item);
-inline long rb_type_array_aget_offset(VALUE idx, rb_type_array_t *ary);
 void rb_type_array_swizzle(char* buf, unsigned long len);
 void _init_type_array();
+
+#define DefineTypeArraySetter(name, coercion) \
+    void rb_type_array_aset_##name(rb_array_buffer_t *buf, long index, VALUE item) \
+    { \
+        rb_type_array_set_##name(buf, index, coercion, TYPE_ARRAY_IS_LITTLE_ENDIAN); \
+    }
+
+#define DefineTypeArrayGetter(name, type, coercion) \
+    VALUE rb_type_array_aref_##name(rb_array_buffer_t *buf, long index) \
+    { \
+        type val = rb_type_array_get_##name(buf, index, TYPE_ARRAY_IS_LITTLE_ENDIAN); \
+        return coercion; \
+    }
 
 #endif
