@@ -141,6 +141,21 @@ class TestDataView < TypeArrayTestCase
     assert_equal 323233.77, view.get_float64(1)
   end
 
+  def test_combo
+    buf = ArrayBuffer.new(100)
+
+    view = DataView.new(buf)
+    view.set_int8(0, 5)
+    view.set_int8(1, 12)
+    view.set_int16(2, 34)
+    view.set_float64(4, 8323.32)
+
+    assert_equal 5, view.get_int8(0)
+    assert_equal 12, view.get_int8(1)
+    assert_equal 34, view.get_int16(2)
+    assert_equal 8323.32, view.get_float64(4)
+  end
+
   def test_std_io
     buf = ArrayBuffer.new(16)
 
@@ -150,7 +165,7 @@ class TestDataView < TypeArrayTestCase
     view.set_int8(0, 5)
     view.set_int8(1, 12)
     view.set_int16(2, 34)
-    view.set_float64(3, 8323.32)
+    view.set_float64(4, 8323.32)
 
     view.write(f)
 
@@ -165,7 +180,7 @@ class TestDataView < TypeArrayTestCase
     assert_equal 5, view.get_int8(0)
     assert_equal 12, view.get_int8(1)
     assert_equal 34, view.get_int16(2)
-    assert_equal 8323.32, view.get_float64(3)
+    assert_equal 8323.32, view.get_float64(4)
 
     f.close
   ensure
@@ -184,7 +199,7 @@ class TestDataView < TypeArrayTestCase
     view.set_int8(0, 5)
     view.set_int8(1, 12)
     view.set_int16(2, 34)
-    view.set_float64(3, 8323.32)
+    view.set_float64(4, 8323.32)
 
     view.write(client)
 
@@ -194,7 +209,7 @@ class TestDataView < TypeArrayTestCase
     assert_equal 5, view.get_int8(0)
     assert_equal 12, view.get_int8(1)
     assert_equal 34, view.get_int16(2)
-    assert_equal 8323.32, view.get_float64(3)
+    assert_equal 8323.32, view.get_float64(4)
 
     s.close
   ensure

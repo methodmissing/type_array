@@ -12,25 +12,23 @@ typedef struct {
     Data_Get_Struct(obj, rb_data_view_t, view); \
     if (!view) rb_raise(rb_eTypeError, "uninitialized DataView!");
 
-#define DataViewAset(obj, idx) \
+#define DataViewAset(obj) \
     VALUE offset, item, little_endian; \
-    unsigned long byte_offset; \
+    unsigned long index; \
     GetDataView(obj); \
     GetArrayBuffer(view->buf); \
     rb_scan_args(argc, argv, "21", &offset, &item, &little_endian); \
     if (NIL_P(little_endian)) little_endian = Qfalse; \
-    byte_offset = FIX2ULONG(offset); \
-    if (offset > view->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
+    index = rb_data_view_assert_offset(view, offset);
 
-#define DataViewAget(obj, idx) \
+#define DataViewAget(obj) \
     VALUE offset, little_endian; \
-    unsigned long byte_offset; \
+	unsigned long index; \
     GetDataView(obj); \
     GetArrayBuffer(view->buf); \
     rb_scan_args(argc, argv, "11", &offset, &little_endian); \
     if (NIL_P(little_endian)) little_endian = Qfalse; \
-    byte_offset = FIX2ULONG(offset); \
-    if (offset > view->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
+    index = rb_data_view_assert_offset(view, offset);
 
 void _init_data_view();
 

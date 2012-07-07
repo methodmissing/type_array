@@ -10,6 +10,14 @@
 
 VALUE rb_cDataView;
 
+static inline unsigned long rb_data_view_assert_offset(rb_data_view_t *view, VALUE idx)
+{
+    unsigned long index;
+    index = FIX2ULONG(idx); \
+    if (index > view->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
+    return index;
+}
+
 /*
  * :nodoc:
  *  GC mark callback
@@ -182,8 +190,8 @@ static VALUE rb_data_view_set_int8(VALUE obj, VALUE offset_, VALUE item_)
     argv[0] = offset_;
     argv[1] = item_;
     argv[2] = Qfalse;
-    DataViewAset(obj, idx);
-    rb_type_array_set_int8(buf->buf, offset, NUM2CHR(item), little_endian);
+    DataViewAset(obj);
+    rb_type_array_set_int8(buf->buf, index, NUM2CHR(item), little_endian);
     return Qnil;
 }
 
@@ -207,8 +215,8 @@ static VALUE rb_data_view_get_int8(VALUE obj, VALUE offset_)
     argc = 1;
     argv[0] = offset_;
     argv[1] = Qfalse;
-    DataViewAget(obj, idx);
-    return CHR2FIX(rb_type_array_get_int8(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return CHR2FIX(rb_type_array_get_int8(buf->buf, index, little_endian));
 }
 
 /*
@@ -231,8 +239,8 @@ static VALUE rb_data_view_set_uint8(VALUE obj, VALUE offset_, VALUE item_)
     argv[0] = offset_;
     argv[1] = item_;
     argv[2] = Qfalse;
-    DataViewAset(obj, idx);
-    rb_type_array_set_uint8(buf->buf, offset, (unsigned char)NUM2CHR(item), little_endian);
+    DataViewAset(obj);
+    rb_type_array_set_uint8(buf->buf, index, (unsigned char)NUM2CHR(item), little_endian);
     return Qnil;
 }
 
@@ -256,8 +264,8 @@ static VALUE rb_data_view_get_uint8(VALUE obj, VALUE offset_)
     argc = 1;
     argv[0] = offset_;
     argv[1] = Qfalse;
-    DataViewAget(obj, idx);
-    return CHR2FIX(rb_type_array_get_uint8(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return CHR2FIX(rb_type_array_get_uint8(buf->buf, index, little_endian));
 }
 
 /*
@@ -275,8 +283,8 @@ static VALUE rb_data_view_get_uint8(VALUE obj, VALUE offset_)
 */
 static VALUE rb_data_view_set_int16(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAset(obj, idx);
-    rb_type_array_set_int16(buf->buf, offset, (short)NUM2INT(item), little_endian);
+    DataViewAset(obj);
+    rb_type_array_set_int16(buf->buf, index, (short)NUM2INT(item), little_endian);
     return Qnil;
 }
 
@@ -295,8 +303,8 @@ static VALUE rb_data_view_set_int16(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_get_int16(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAget(obj, idx);
-    return INT2FIX(rb_type_array_get_int16(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return INT2FIX(rb_type_array_get_int16(buf->buf, index, little_endian));
 }
 
 /*
@@ -313,8 +321,8 @@ static VALUE rb_data_view_get_int16(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_set_uint16(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAset(obj, idx);
-    rb_type_array_set_uint16(buf->buf, offset, (unsigned short)NUM2INT(item), little_endian);
+    DataViewAset(obj);
+    rb_type_array_set_uint16(buf->buf, index, (unsigned short)NUM2INT(item), little_endian);
     return Qnil;
 }
 
@@ -333,8 +341,8 @@ static VALUE rb_data_view_set_uint16(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_get_uint16(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAget(obj, idx);
-    return INT2FIX(rb_type_array_get_uint16(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return INT2FIX(rb_type_array_get_uint16(buf->buf, index, little_endian));
 }
 
 /*
@@ -352,8 +360,8 @@ static VALUE rb_data_view_get_uint16(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_set_int32(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAset(obj, idx);
-    rb_type_array_set_int32(buf->buf, offset, NUM2INT(item), little_endian);
+    DataViewAset(obj);
+    rb_type_array_set_int32(buf->buf, index, NUM2INT(item), little_endian);
     return Qnil;
 }
 
@@ -372,8 +380,8 @@ static VALUE rb_data_view_set_int32(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_get_int32(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAget(obj, idx);
-    return INT2FIX(rb_type_array_get_int32(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return INT2FIX(rb_type_array_get_int32(buf->buf, index, little_endian));
 }
 
 /*
@@ -390,8 +398,8 @@ static VALUE rb_data_view_get_int32(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_set_uint32(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAset(obj, idx);
-    rb_type_array_set_uint32(buf->buf, offset, (unsigned int)NUM2INT(item), little_endian);
+    DataViewAset(obj);
+    rb_type_array_set_uint32(buf->buf, index, (unsigned int)NUM2INT(item), little_endian);
     return Qnil;
 }
 
@@ -410,8 +418,8 @@ static VALUE rb_data_view_set_uint32(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_get_uint32(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAget(obj, idx);
-    return INT2FIX(rb_type_array_get_uint32(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return INT2FIX(rb_type_array_get_uint32(buf->buf, index, little_endian));
 }
 
 /*
@@ -429,7 +437,7 @@ static VALUE rb_data_view_get_uint32(int argc, VALUE *argv, VALUE obj)
 static VALUE rb_data_view_set_float32(int argc, VALUE *argv, VALUE obj)
 {
     float val;
-    DataViewAset(obj, idx);
+    DataViewAset(obj);
     switch (TYPE(item)) {
       case T_FIXNUM:
           val = (float)FIX2LONG(item);
@@ -443,7 +451,7 @@ static VALUE rb_data_view_set_float32(int argc, VALUE *argv, VALUE obj)
       default:
           rb_raise(rb_eTypeError, "Type arrays only support Fixnum, Bignum and Float instances");
     }
-    rb_type_array_set_float32(buf->buf, offset, val, little_endian);
+    rb_type_array_set_float32(buf->buf, index, val, little_endian);
     return Qnil;
 }
 
@@ -462,8 +470,8 @@ static VALUE rb_data_view_set_float32(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_get_float32(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAget(obj, idx);
-    return rb_float_new((double)rb_type_array_get_float32(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return rb_float_new((double)rb_type_array_get_float32(buf->buf, index, little_endian));
 }
 
 /*
@@ -481,7 +489,7 @@ static VALUE rb_data_view_get_float32(int argc, VALUE *argv, VALUE obj)
 static VALUE rb_data_view_set_float64(int argc, VALUE *argv, VALUE obj)
 {
     double val;
-    DataViewAset(obj, idx);
+    DataViewAset(obj);
     switch (TYPE(item)) {
       case T_FIXNUM:
           val = (double)FIX2LONG(item);
@@ -495,7 +503,7 @@ static VALUE rb_data_view_set_float64(int argc, VALUE *argv, VALUE obj)
       default:
           rb_raise(rb_eTypeError, "Type arrays only support Fixnum, Bignum and Float instances");
     }
-    rb_type_array_set_float64(buf->buf, offset, val, little_endian);
+    rb_type_array_set_float64(buf->buf, index, val, little_endian);
     return Qnil;
 }
 
@@ -514,8 +522,8 @@ static VALUE rb_data_view_set_float64(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_data_view_get_float64(int argc, VALUE *argv, VALUE obj)
 {
-    DataViewAget(obj, idx);
-    return rb_float_new(rb_type_array_get_float64(buf->buf, offset, little_endian));
+    DataViewAget(obj);
+    return rb_float_new(rb_type_array_get_float64(buf->buf, index, little_endian));
 }
 
 /*
