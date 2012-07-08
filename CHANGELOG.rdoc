@@ -1,0 +1,4 @@
+= Changelog
+
+== 0.1.0 (July 8th, 2012)
+* initial release

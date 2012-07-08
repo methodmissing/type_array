@@ -37,7 +37,7 @@ float rb_type_array_get_float32(void *abuf, unsigned long index, VALUE swiz);
 double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
 
 #define DefineTypeGetter(name, type) \
-    type rb_type_array_get_##name(void *abuf, unsigned long index, VALUE swiz) \
+    inline type rb_type_array_get_##name(void *abuf, unsigned long index, VALUE swiz) \
     { \
         char buf[sizeof(type)]; \
         type val; \
@@ -48,7 +48,7 @@ double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
     }
 
 #define DefineTypeSetter(name, type) \
-    void rb_type_array_set_##name(void *abuf, unsigned long index, type val, VALUE swiz) \
+    inline void rb_type_array_set_##name(void *abuf, unsigned long index, type val, VALUE swiz) \
     { \
         char buf[sizeof(type)]; \
         memmove(buf, &val, sizeof(type)); \

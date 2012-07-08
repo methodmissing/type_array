@@ -3,3 +3,131 @@
 (c) 2012 Lourens Naudé (methodmissing)
 
   http://github.com/methodmissing/type_array
+
+This library provides portable, high performance and memory-safe access to native-typed binary data. It defines a generic fixed length buffer type as well as accessor types (views) for accessing data stored within the buffer.
+
+Where binary data has needed to be manipulated, it is often stored as a String or Array. Both of these methods are slow and error-prone. Several protocol implementations would benefit from being able to read and write binary data directly to it's native form.
+
+Supported numeric types :
+
+* an unsigned-integer: one of uint8, uint16, uint32
+* a signed-integer: one of int8, int16, int32
+* a floating-point: one of float32 or float64
+
+There's a few different kinds of typed arrays defined :
+
+* Int8Array - 8-bit 2's complement signed integer
+* UInt8Array - 8-bit unsigned integer
+* Int16Array - 16-bit 2's complement signed integer
+* UInt16Array - 16-bit unsigned integer
+* Int32Array - 32-bit 2's complement signed integer
+* Uint32Array - 32-bit unsigned integer
+* Float32Array - 32-bit IEEE floating point
+* Float64Array - 64-bit IEEE floating point
+
+== Type Conversion
+
+====== Type         Size    Description                             Equivalent C Type    Ruby Type
+
+Int8Array     1       8-bit 2's complement signed integer     signed char          Fixnum
+Uint8Array    1       8-bit unsigned integer                  unsigned char        Fixnum
+Int16Array    2       16-bit 2's complement signed integer    short                Fixnum
+Uint16Array   2       16-bit unsigned integer                 unsigned short       Fixnum
+Int32Array    4       32-bit 2's complement signed integer    int                  Fixnum / Bignum
+Uint32Array   4       32-bit unsigned integer                 unsigned int         Fixnum / Bignum
+Float32Array  4       32-bit IEEE floating point              float                Float
+Float64Array  8       64-bit IEEE floating point              double               Float
+
+== Array Buffers
+
+An opaque buffer with an explicit and fixed length. ArrayBuffer contents cannot be accessed directly - there's no Ruby API exposed to manipulate it.
+
+    buf = ArrayBuffer.new(8)         =>  ArrayBuffer
+    buf.byte_length                  =>  8
+
+    buf = ArrayBuffer.new("buffer")  =>  ArrayBuffer
+    buf.byte_length                  =>  6
+    buf.to_s                         =>  "buffer"
+
+== Type Arrays
+
+A group of types are used to create views of the ArrayBuffer. For example, to access the buffer as an array of 32-bit signed integers, an Int32Array would be created that refers to the ArrayBuffer.
+
+A number of types are introduced that describe how to interpret the bytes in an ArrayBuffer. For example, an Int32Array views the bytes in an ArrayBuffer (or a subregion of an ArrayBuffer) as 32-bit signed integers. Elements of the array are accessible by getting or setting their index.
+
+    buf = ArrayBuffer.new("buffer")    =>  ArrayBuffer
+    ary = Int32Array.new(buf)          =>  Int32Array
+    ary.to_s                           =>  "buffer"
+
+    ary = Int32Array.new("01234567")   =>  Int32Array
+    ary[1] = 23                        =>  nil
+    ary[1]                             =>  23
+
+    buf = ArrayBuffer.new(100)         =>  ArrayBuffer
+
+    ary = Int32Array.new(buf, 20)      =>  Int32Array
+    ary.length                         =>  20
+    ary.byte_length                    =>  80
+    ary.byte_offset                    =>  20
+
+    ary = Int32Array.new(buf, 0, 20)   =>  Int32Array
+    ary.length                         =>  20
+    ary.byte_length                    =>  80
+    ary.byte_offset                    =>  0
+
+    ary = Int32Array.new(buf, 20, 20)  =>  Int32Array
+    ary.length                         =>  20
+    ary.byte_length                    =>  80
+    ary.byte_offset                    =>  20
+
+    ary = Int32Array.new("01234567")   =>  Int32Array
+    ary.byte_length                    =>  8
+    ary.to_s                           =>  "01234567"
+
+    ary = Int32Array.new(100)          =>  Int32Array
+    ary.length                         =>  100
+    ary.byte_length                    =>  400
+
+== Data Views
+
+Multiple views can exist for the same ArrayBuffer, allowing for complex data structures to be built up, albeit with some difficulty. A DataView type is introduced which allows arbitrary indexed reads and writes of basic types from the bytes in the underlying ArrayBuffer. The goal is to allow as close to the native byte access as possible with very few performance penalties, while still retaining safety.
+
+    buf = ArrayBuffer.new(100)   =>  ArrayBuffer
+    view = DataView.new(buf)     =>  DataView
+    view.set_float64(2, 77.643)  =>  nil
+    view.get_float64(2)          =>  758
+
+    buf = ArrayBuffer.new(100)  => ArrayBuffer
+    view = DataView.new(buf)    =>  DataView
+    view.set_uint32(2, 758)     =>  nil
+    view.get_uint32(2)          =>  758
+
+    buf = ArrayBuffer.new(100)  => ArrayBuffer
+    view = DataView.new(buf)    =>  DataView
+    view.set_int16(2, 20)       =>  nil
+    view.get_int16(2)           =>  20
+
+== Requirements
+
+* Known to work well on Linux, BSD variants and Mac OS X (not tested on Windows)
+* A C compiler
+* Ruby MRI 1.8 or 1.9, Rubinius or JRuby (versions 1.6 and up, C API is deprecated though)
+
+== Installation
+
+Rubygems installation
+
+    gem install type_array
+
+Building from source
+
+    git clone git@github.com:methodmissing/type_array.git
+    rake
+
+Running tests
+
+    rake test
+
+== Contact, feedback and bugs
+
+This project is still work in progress. Please log bugs and suggestions at https://github.com/methodmissing/type_array/issues
