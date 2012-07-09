@@ -27,8 +27,8 @@ There's a few different kinds of typed arrays defined :
 
 == Type Conversion
 
-====== Type         Size    Description                             Equivalent C Type    Ruby Type
-
+    Type         Size    Description                             Equivalent C Type    Ruby Type
+    --------------------------------------------------------------------------------------------------
     Int8Array     1       8-bit 2's complement signed integer     signed char          Fixnum
     Uint8Array    1       8-bit unsigned integer                  unsigned char        Fixnum
     Int16Array    2       16-bit 2's complement signed integer    short                Fixnum
