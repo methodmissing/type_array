@@ -1,4 +1,4 @@
-= TypeArray - Ruby implementation of the ECMAScript spec ( http://wiki.ecmascript.org/doku.php?id=strawman:typed_arrays )
+= TypeArray - Ruby implementation of the ECMAScript spec ( http://wiki.ecmascript.org/doku.php?id=strawman:typed_arrays ) {<img src="https://secure.travis-ci.org/methodmissing/type_array.png" alt="Build Status" />}[http://travis-ci.org/methodmissing/type_array]
 
 (c) 2012 Lourens Naudé (methodmissing)
 
@@ -29,14 +29,14 @@ There's a few different kinds of typed arrays defined :
 
 ====== Type         Size    Description                             Equivalent C Type    Ruby Type
 
-Int8Array     1       8-bit 2's complement signed integer     signed char          Fixnum
-Uint8Array    1       8-bit unsigned integer                  unsigned char        Fixnum
-Int16Array    2       16-bit 2's complement signed integer    short                Fixnum
-Uint16Array   2       16-bit unsigned integer                 unsigned short       Fixnum
-Int32Array    4       32-bit 2's complement signed integer    int                  Fixnum / Bignum
-Uint32Array   4       32-bit unsigned integer                 unsigned int         Fixnum / Bignum
-Float32Array  4       32-bit IEEE floating point              float                Float
-Float64Array  8       64-bit IEEE floating point              double               Float
+    Int8Array     1       8-bit 2's complement signed integer     signed char          Fixnum
+    Uint8Array    1       8-bit unsigned integer                  unsigned char        Fixnum
+    Int16Array    2       16-bit 2's complement signed integer    short                Fixnum
+    Uint16Array   2       16-bit unsigned integer                 unsigned short       Fixnum
+    Int32Array    4       32-bit 2's complement signed integer    int                  Fixnum / Bignum
+    Uint32Array   4       32-bit unsigned integer                 unsigned int         Fixnum / Bignum
+    Float32Array  4       32-bit IEEE floating point              float                Float
+    Float64Array  8       64-bit IEEE floating point              double               Float
 
 == Array Buffers
 
