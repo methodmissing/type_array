@@ -314,16 +314,16 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->aset_fn = rb_type_array_aset_float64;
     }
 
-    if (FIXNUM_P(obj)) { // Length constructor
+    if (FIXNUM_P(obj)) {
         array->length = FIX2ULONG(obj);
         array->byte_length = (array->length * array->size);
         array->buf = rb_alloc_array_buffer(array->byte_length, NULL);
-    } else if (rb_type(obj) == T_STRING) { // String constructor
+    } else if (rb_type(obj) == T_STRING) {
         array->byte_length = (unsigned long)RSTRING_LEN(obj);
         array->length = (array->byte_length / array->size);
         ArrayBufferEncode(obj);
         array->buf = rb_alloc_array_buffer(array->byte_length, (void *)RSTRING_PTR(obj));
-    } else if (rb_class_of(obj) == rb_cArrayBuffer) { // ArrayBuffer constructor
+    } else if (rb_class_of(obj) == rb_cArrayBuffer) {
         GetArrayBuffer(obj);
         if (!NIL_P(byte_offset)) {
             Check_Type(byte_offset, T_FIXNUM);
@@ -347,7 +347,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
              rb_raise(rb_eRangeError, "Length is out of range.");
         }
         array->buf = obj;
-    } else if (rb_obj_is_kind_of(obj, rb_cTypeArray) == Qtrue) { // TypeArray constructor
+    } else if (rb_obj_is_kind_of(obj, rb_cTypeArray) == Qtrue) {
         GetTypeArray(obj);
         array->length = ary->length;
         array->byte_length = (array->size * array->length);

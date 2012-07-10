@@ -87,9 +87,9 @@ static VALUE rb_copy_array_buffer(rb_array_buffer_t *source, long begin, long en
 static VALUE rb_array_buffer_s_new(VALUE klass, VALUE obj)
 {
     VALUE buffer;
-    if (FIXNUM_P(obj)) { // Length constructor
+    if (FIXNUM_P(obj)) {
         buffer = rb_alloc_array_buffer(FIX2ULONG(obj), NULL);
-    } else if (rb_type(obj) == T_STRING) { // String constructor
+    } else if (rb_type(obj) == T_STRING) {
         ArrayBufferEncode(obj);
         buffer = rb_alloc_array_buffer((unsigned long)RSTRING_LEN(obj), (void *)RSTRING_PTR(obj));
     } else {

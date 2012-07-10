@@ -82,11 +82,11 @@ static VALUE rb_data_view_s_new(int argc, VALUE *argv, VALUE klass)
     data_view = Data_Make_Struct(klass, rb_data_view_t, rb_mark_data_view, rb_free_data_view, view);
     view->byte_offset = 0;
     view->byte_length = 0;
-    if (rb_class_of(obj) == rb_cArrayBuffer) { // ArrayBuffer constructor
+    if (rb_class_of(obj) == rb_cArrayBuffer) {
         GetArrayBuffer(obj);
         view->byte_length = buf->length;
         view->buf = obj;
-    } else if (rb_type(obj) == T_STRING){ // String constructor
+    } else if (rb_type(obj) == T_STRING){
         ArrayBufferEncode(obj);
         buffer = rb_alloc_array_buffer((unsigned long)RSTRING_LEN(obj), (void *)RSTRING_PTR(obj));
         GetArrayBuffer(buffer);
