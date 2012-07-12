@@ -2,7 +2,7 @@
 #define TYPE_ARRAY_EXT_H
 
 #include "ruby.h"
-#include <prelude.h>
+#include "prelude.h"
 
 extern VALUE rb_cArrayBuffer;
 
@@ -64,8 +64,8 @@ double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
     DefineTypeSetter(name, type); \
     DefineTypeGetter(name, type);
 
-#include <array_buffer.h>
-#include <type_array.h>
-#include <data_view.h>
+#include "array_buffer.h"
+#include "type_array.h"
+#include "data_view.h"
 
 #endif

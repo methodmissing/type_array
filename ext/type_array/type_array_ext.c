@@ -1,4 +1,4 @@
-#include <type_array_ext.h>
+#include "type_array_ext.h"
 
 #ifdef HAVE_RUBY_ENCODING_H
 rb_encoding *binary_encoding;

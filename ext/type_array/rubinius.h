@@ -14,4 +14,6 @@ extern rb_encoding *binary_encoding;
 #define TRAP_BEG
 #define TRAP_END
 
+#define FIXNUM_FLAG 0x01
+
 #endif

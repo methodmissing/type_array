@@ -133,6 +133,7 @@ Running tests
 * Support Marshal dump / load
 * Low level API for math operations on array elements without creating any Ruby objects
 * Support structs / records
+* Handle edges where coercion to and from Bignum is more appropriate
 
 == Contact, feedback and bugs
 
