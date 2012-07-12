@@ -128,6 +128,12 @@ Running tests
 
     rake test
 
+== Todo
+
+* Support Marshal dump / load
+* Low level API for math operations on array elements without creating any Ruby objects
+* Support structs / records
+
 == Contact, feedback and bugs
 
 This project is still work in progress. Please log bugs and suggestions at https://github.com/methodmissing/type_array/issues
