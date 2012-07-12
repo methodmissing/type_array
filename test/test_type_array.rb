@@ -152,4 +152,52 @@ class TestTypeArray < TypeArrayTestCase
   ensure
     s.close rescue nil
   end
+
+  def test_mul
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 8
+
+    assert_equal 8, ary.mul(0,1)
+    assert_equal 32, ary.mul(1, 2)
+  end
+
+  def test_plus
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 8
+
+    assert_equal 6, ary.plus(0,1)
+    assert_equal 12, ary.plus(1, 2)
+  end
+
+  def test_minus
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 8
+
+    assert_equal 2, ary.minus(1,0)
+    assert_equal 4, ary.minus(2, 1)
+  end
+
+  def test_div
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 8
+
+    assert_equal 2, ary.div(1,0)
+    assert_equal 2, ary.div(2, 1)
+  end
 end

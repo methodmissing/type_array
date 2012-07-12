@@ -31,6 +31,13 @@ DefineTypeArraySetter(int8, (signed char)NUM2CHR(item));
 
 /*
  * :nodoc:
+ *  Defines operator functions for int8s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(int8, signed char, TACHR2FIX(val));
+
+/*
+ * :nodoc:
  *  Coerces an int8 at a given offset to a Ruby object, according to host endianness.
  *
 */
@@ -52,6 +59,13 @@ DefineTypeArrayGetter(uint8, unsigned char, TACHR2FIX(val));
 
 /*
  * :nodoc:
+ *  Defines operator functions for uint8s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(uint8, unsigned char, TACHR2FIX(val));
+
+/*
+ * :nodoc:
  *  Coerces a Ruby object to an int16 at a given offset, according to host endianness.
  *
 */
@@ -63,6 +77,13 @@ DefineTypeArraySetter(int16, (short)NUM2INT(item));
  *
 */
 DefineTypeArrayGetter(int16, short, INT2FIX(val));
+
+/*
+ * :nodoc:
+ *  Defines operator functions for int16s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(int16, short, INT2FIX(val));
 
 /*
  * :nodoc:
@@ -80,6 +101,13 @@ DefineTypeArrayGetter(uint16, unsigned short, INT2FIX(val));
 
 /*
  * :nodoc:
+ *  Defines operator functions for uint16s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(uint16, unsigned short, INT2FIX(val));
+
+/*
+ * :nodoc:
  *  Coerces a Ruby object to an int32 at a given offset, according to host endianness.
  *
 */
@@ -94,6 +122,13 @@ DefineTypeArrayGetter(int32, int, INT2FIX(val));
 
 /*
  * :nodoc:
+ *  Defines operator functions for int32s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(int32, int, INT2FIX(val));
+
+/*
+ * :nodoc:
  *  Coerces a Ruby object to an unsigned int32 at a given offset, according to host endianness.
  *
 */
@@ -105,6 +140,13 @@ DefineTypeArraySetter(uint32, NUM2UINT(item));
  *
 */
 DefineTypeArrayGetter(uint32, unsigned int, UINT2NUM(val));
+
+/*
+ * :nodoc:
+ *  Defines operator functions for uint32s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(uint32, unsigned int, UINT2NUM(val));
 
 /*
  * :nodoc:
@@ -139,6 +181,13 @@ DefineTypeArrayGetter(float32, float, rb_float_new((double)val));
 
 /*
  * :nodoc:
+ *  Defines operator functions for float32s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(float32, float, rb_float_new((double)val));
+
+/*
+ * :nodoc:
  *  Coerces a Ruby object to a float64 (double) at a given offset, according to host endianness.
  *
 */
@@ -167,6 +216,13 @@ static void rb_type_array_aset_float64(rb_array_buffer_t *buf, long index, VALUE
  *
 */
 DefineTypeArrayGetter(float64, double, rb_float_new(val));
+
+/*
+ * :nodoc:
+ *  Defines operator functions for float64s at given offsets, according to host endianness.
+ *
+*/
+DefineTypeArrayOperators(float64, double, rb_float_new(val));
 
 /*
  * :nodoc:
@@ -291,27 +347,59 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     if (klass == rb_cInt8Array) {
         array->aref_fn = rb_type_array_aref_int8;
         array->aset_fn = rb_type_array_aset_int8;
+        array->mul_fn = rb_type_array_mul_int8;
+        array->plus_fn = rb_type_array_plus_int8;
+        array->minus_fn = rb_type_array_minus_int8;
+        array->div_fn = rb_type_array_div_int8;
     } else if (klass == rb_cUInt8Array) {
         array->aref_fn = rb_type_array_aref_uint8;
         array->aset_fn = rb_type_array_aset_uint8;
+        array->mul_fn = rb_type_array_mul_uint8;
+        array->plus_fn = rb_type_array_plus_uint8;
+        array->minus_fn = rb_type_array_minus_uint8;
+        array->div_fn = rb_type_array_div_uint8;
     } else if (klass == rb_cInt16Array) {
         array->aref_fn = rb_type_array_aref_int16;
         array->aset_fn = rb_type_array_aset_int16;
+        array->mul_fn = rb_type_array_mul_int16;
+        array->plus_fn = rb_type_array_plus_int16;
+        array->minus_fn = rb_type_array_minus_int16;
+        array->div_fn = rb_type_array_div_int16;
     } else if (klass == rb_cUInt16Array) {
         array->aref_fn = rb_type_array_aref_uint16;
         array->aset_fn = rb_type_array_aset_uint16;
+        array->mul_fn = rb_type_array_mul_uint16;
+        array->plus_fn = rb_type_array_plus_uint16;
+        array->minus_fn = rb_type_array_minus_uint16;
+        array->div_fn = rb_type_array_div_uint16;
     } else if (klass == rb_cInt32Array) {
         array->aref_fn = rb_type_array_aref_int32;
         array->aset_fn = rb_type_array_aset_int32;
+        array->mul_fn = rb_type_array_mul_int32;
+        array->plus_fn = rb_type_array_plus_int32;
+        array->minus_fn = rb_type_array_minus_int32;
+        array->div_fn = rb_type_array_div_int32;
     } else if (klass == rb_cUInt32Array) {
         array->aref_fn = rb_type_array_aref_uint32;
         array->aset_fn = rb_type_array_aset_uint32;
+        array->mul_fn = rb_type_array_mul_uint32;
+        array->plus_fn = rb_type_array_plus_uint32;
+        array->minus_fn = rb_type_array_minus_uint32;
+        array->div_fn = rb_type_array_div_uint32;
     } else if (klass == rb_cFloat32Array) {
         array->aref_fn = rb_type_array_aref_float32;
         array->aset_fn = rb_type_array_aset_float32;
+        array->mul_fn = rb_type_array_mul_float32;
+        array->plus_fn = rb_type_array_plus_float32;
+        array->minus_fn = rb_type_array_minus_float32;
+        array->div_fn = rb_type_array_div_float32;
     } else if (klass == rb_cFloat64Array) {
         array->aref_fn = rb_type_array_aref_float64;
         array->aset_fn = rb_type_array_aset_float64;
+        array->mul_fn = rb_type_array_mul_float64;
+        array->plus_fn = rb_type_array_plus_float64;
+        array->minus_fn = rb_type_array_minus_float64;
+        array->div_fn = rb_type_array_div_float64;
     }
 
     if (FIXNUM_P(obj)) {
@@ -380,6 +468,106 @@ static VALUE rb_type_array_byte_length(VALUE obj)
 {
     GetTypeArray(obj);
     return ULONG2NUM(ary->byte_length);
+}
+
+/*
+ *  call-seq:
+ *     ary.mul(0,1)                      =>  Fixnum, Bignum or Float
+ *
+ *  Gets two values at given offsets and multiples them - only the result's coerced to a Ruby object.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
+ *     ary = Int32Array.new(buf)         =>  Int32Array
+ *     ary[0] = 2                        =>  nil
+ *     ary[1] = 4                        =>  nil
+ *     ary[2] = 8                        =>  nil
+ *
+ *     ary.mul(0,1)                      =>  8
+ *     ary.mul(1,2)                      =>  32
+*/
+static VALUE rb_type_array_mul(VALUE obj, VALUE off1, VALUE off2)
+{
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+    long offset1 = rb_type_array_assert_offset(ary, off1);
+    long offset2 = rb_type_array_assert_offset(ary, off2);
+    return ary->mul_fn(buf->buf, offset1, offset2);
+}
+
+/*
+ *  call-seq:
+ *     ary.plus(0,1)                     =>  Fixnum, Bignum or Float
+ *
+ *  Gets two values at given offsets and adds them - only the result's coerced to a Ruby object.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
+ *     ary = Int32Array.new(buf)         =>  Int32Array
+ *     ary[0] = 2                        =>  nil
+ *     ary[1] = 4                        =>  nil
+ *     ary[2] = 8                        =>  nil
+ *
+ *     ary.plus(0,1)                     =>  6
+ *     ary.plus(1,2)                     =>  12
+*/
+static VALUE rb_type_array_plus(VALUE obj, VALUE off1, VALUE off2)
+{
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+    long offset1 = rb_type_array_assert_offset(ary, off1);
+    long offset2 = rb_type_array_assert_offset(ary, off2);
+    return ary->plus_fn(buf->buf, offset1, offset2);
+}
+
+/*
+ *  call-seq:
+ *     ary.minus(0,1)                    =>  Fixnum, Bignum or Float
+ *
+ *  Gets two values at given offsets and subtracts them - only the result's coerced to a Ruby object.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
+ *     ary = Int32Array.new(buf)         =>  Int32Array
+ *     ary[0] = 2                        =>  nil
+ *     ary[1] = 4                        =>  nil
+ *     ary[2] = 8                        =>  nil
+ *
+ *     ary.minus(1, 0)                   =>  2
+ *     ary.minus(2, 1)                   =>  4
+*/
+static VALUE rb_type_array_minus(VALUE obj, VALUE off1, VALUE off2)
+{
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+    long offset1 = rb_type_array_assert_offset(ary, off1);
+    long offset2 = rb_type_array_assert_offset(ary, off2);
+    return ary->minus_fn(buf->buf, offset1, offset2);
+}
+
+/*
+ *  call-seq:
+ *     ary.div(0,1)                      =>  Fixnum, Bignum or Float
+ *
+ *  Gets two values at given offsets and divides them - only the result's coerced to a Ruby object.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
+ *     ary = Int32Array.new(buf)         =>  Int32Array
+ *     ary[0] = 2                        =>  nil
+ *     ary[1] = 4                        =>  nil
+ *     ary[2] = 8                        =>  nil
+ *
+ *     ary.div(1, 0)                     =>  2
+ *     ary.div(2, 1)                     =>  2
+*/
+static VALUE rb_type_array_div(VALUE obj, VALUE off1, VALUE off2)
+{
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+    long offset1 = rb_type_array_assert_offset(ary, off1);
+    long offset2 = rb_type_array_assert_offset(ary, off2);
+    return ary->div_fn(buf->buf, offset1, offset2);
 }
 
 /*
@@ -537,4 +725,8 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "to_s", rb_type_array_to_s, 0);
     rb_define_method(rb_cTypeArray, "[]=", rb_type_array_aset, 2);
     rb_define_method(rb_cTypeArray, "[]", rb_type_array_aget, 1);
+    rb_define_method(rb_cTypeArray, "mul", rb_type_array_mul, 2);
+    rb_define_method(rb_cTypeArray, "plus", rb_type_array_plus, 2);
+    rb_define_method(rb_cTypeArray, "minus", rb_type_array_minus, 2);
+    rb_define_method(rb_cTypeArray, "div", rb_type_array_div, 2);
 }
