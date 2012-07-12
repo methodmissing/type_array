@@ -200,4 +200,29 @@ class TestTypeArray < TypeArrayTestCase
     assert_equal 2, ary.div(1,0)
     assert_equal 2, ary.div(2, 1)
   end
+
+  def test_eql
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 4
+    ary[3] = 2
+
+    assert ary.eql(0, 3)
+    assert ary.eql(1, 2)
+    assert !ary.eql(0, 1)
+
+    buf = ArrayBuffer.new(24)
+
+    ary = Float64Array.new(buf)
+
+    ary[0] = 2.33
+    ary[1] = 2.33
+    ary[2] = 7.45
+
+    assert ary.eql(0,1)
+    assert !ary.eql(1,2)
+  end
 end

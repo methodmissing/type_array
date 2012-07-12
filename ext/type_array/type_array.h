@@ -16,6 +16,7 @@ typedef struct {
     type_array_operator_fn *plus_fn;
     type_array_operator_fn *minus_fn;
     type_array_operator_fn *div_fn;
+    type_array_operator_fn *eql_fn;
     VALUE buf;
 } rb_type_array_t;
 
@@ -44,7 +45,7 @@ void _init_type_array();
     DefineTypeArrayOperator(mul, *, name, type, coercion); \
     DefineTypeArrayOperator(plus, +, name, type, coercion); \
     DefineTypeArrayOperator(minus, -, name, type, coercion); \
-    DefineTypeArrayOperator(div, /, name, type, coercion);
+    DefineTypeArrayOperator(div, /, name, type, coercion); \
 
 #define DefineTypeArrayOperator(op_name, op, name, type, coercion) \
     VALUE rb_type_array_##op_name##_##name(rb_array_buffer_t *buf, long off1, long off2) \

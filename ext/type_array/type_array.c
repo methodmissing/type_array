@@ -35,6 +35,7 @@ DefineTypeArraySetter(int8, (signed char)NUM2CHR(item));
  *
 */
 DefineTypeArrayOperators(int8, signed char, TACHR2FIX(val));
+DefineTypeArrayOperator(eql, ==, int8, signed char, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -63,6 +64,7 @@ DefineTypeArrayGetter(uint8, unsigned char, TACHR2FIX(val));
  *
 */
 DefineTypeArrayOperators(uint8, unsigned char, TACHR2FIX(val));
+DefineTypeArrayOperator(eql, ==, uint8, unsigned char, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -84,6 +86,7 @@ DefineTypeArrayGetter(int16, short, INT2FIX(val));
  *
 */
 DefineTypeArrayOperators(int16, short, INT2FIX(val));
+DefineTypeArrayOperator(eql, ==, int16, short, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -105,6 +108,7 @@ DefineTypeArrayGetter(uint16, unsigned short, INT2FIX(val));
  *
 */
 DefineTypeArrayOperators(uint16, unsigned short, INT2FIX(val));
+DefineTypeArrayOperator(eql, ==, uint16, unsigned short, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -126,6 +130,7 @@ DefineTypeArrayGetter(int32, int, INT2FIX(val));
  *
 */
 DefineTypeArrayOperators(int32, int, INT2FIX(val));
+DefineTypeArrayOperator(eql, ==, int32, int, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -147,6 +152,7 @@ DefineTypeArrayGetter(uint32, unsigned int, UINT2NUM(val));
  *
 */
 DefineTypeArrayOperators(uint32, unsigned int, UINT2NUM(val));
+DefineTypeArrayOperator(eql, ==, uint32, unsigned int, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -185,6 +191,7 @@ DefineTypeArrayGetter(float32, float, rb_float_new((double)val));
  *
 */
 DefineTypeArrayOperators(float32, float, rb_float_new((double)val));
+DefineTypeArrayOperator(eql, ==, float32, float, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -223,6 +230,7 @@ DefineTypeArrayGetter(float64, double, rb_float_new(val));
  *
 */
 DefineTypeArrayOperators(float64, double, rb_float_new(val));
+DefineTypeArrayOperator(eql, ==, float64, double, (val == 0 ? Qfalse : Qtrue));
 
 /*
  * :nodoc:
@@ -351,6 +359,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_int8;
         array->minus_fn = rb_type_array_minus_int8;
         array->div_fn = rb_type_array_div_int8;
+        array->eql_fn = rb_type_array_eql_int8;
     } else if (klass == rb_cUInt8Array) {
         array->aref_fn = rb_type_array_aref_uint8;
         array->aset_fn = rb_type_array_aset_uint8;
@@ -358,6 +367,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_uint8;
         array->minus_fn = rb_type_array_minus_uint8;
         array->div_fn = rb_type_array_div_uint8;
+        array->eql_fn = rb_type_array_eql_uint8;
     } else if (klass == rb_cInt16Array) {
         array->aref_fn = rb_type_array_aref_int16;
         array->aset_fn = rb_type_array_aset_int16;
@@ -365,6 +375,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_int16;
         array->minus_fn = rb_type_array_minus_int16;
         array->div_fn = rb_type_array_div_int16;
+        array->eql_fn = rb_type_array_eql_int16;
     } else if (klass == rb_cUInt16Array) {
         array->aref_fn = rb_type_array_aref_uint16;
         array->aset_fn = rb_type_array_aset_uint16;
@@ -372,6 +383,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_uint16;
         array->minus_fn = rb_type_array_minus_uint16;
         array->div_fn = rb_type_array_div_uint16;
+        array->eql_fn = rb_type_array_eql_uint16;
     } else if (klass == rb_cInt32Array) {
         array->aref_fn = rb_type_array_aref_int32;
         array->aset_fn = rb_type_array_aset_int32;
@@ -379,6 +391,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_int32;
         array->minus_fn = rb_type_array_minus_int32;
         array->div_fn = rb_type_array_div_int32;
+        array->eql_fn = rb_type_array_eql_int32;
     } else if (klass == rb_cUInt32Array) {
         array->aref_fn = rb_type_array_aref_uint32;
         array->aset_fn = rb_type_array_aset_uint32;
@@ -386,6 +399,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_uint32;
         array->minus_fn = rb_type_array_minus_uint32;
         array->div_fn = rb_type_array_div_uint32;
+        array->eql_fn = rb_type_array_eql_uint32;
     } else if (klass == rb_cFloat32Array) {
         array->aref_fn = rb_type_array_aref_float32;
         array->aset_fn = rb_type_array_aset_float32;
@@ -393,6 +407,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_float32;
         array->minus_fn = rb_type_array_minus_float32;
         array->div_fn = rb_type_array_div_float32;
+        array->eql_fn = rb_type_array_eql_float32;
     } else if (klass == rb_cFloat64Array) {
         array->aref_fn = rb_type_array_aref_float64;
         array->aset_fn = rb_type_array_aset_float64;
@@ -400,6 +415,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->plus_fn = rb_type_array_plus_float64;
         array->minus_fn = rb_type_array_minus_float64;
         array->div_fn = rb_type_array_div_float64;
+        array->eql_fn = rb_type_array_eql_float64;
     }
 
     if (FIXNUM_P(obj)) {
@@ -572,6 +588,31 @@ static VALUE rb_type_array_div(VALUE obj, VALUE off1, VALUE off2)
 
 /*
  *  call-seq:
+ *     ary.div(0,1)                      =>  Fixnum, Bignum or Float
+ *
+ *  Gets two values at given offsets and divides them - only the result's coerced to a Ruby object.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
+ *     ary = Int32Array.new(buf)         =>  Int32Array
+ *     ary[0] = 2                        =>  nil
+ *     ary[1] = 4                        =>  nil
+ *     ary[2] = 8                        =>  nil
+ *
+ *     ary.div(1, 0)                     =>  2
+ *     ary.div(2, 1)                     =>  2
+*/
+static VALUE rb_type_array_eql(VALUE obj, VALUE off1, VALUE off2)
+{
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+    long offset1 = rb_type_array_assert_offset(ary, off1);
+    long offset2 = rb_type_array_assert_offset(ary, off2);
+    return ary->eql_fn(buf->buf, offset1, offset2);
+}
+
+/*
+ *  call-seq:
  *     ary.length                        =>  Fixnum
  *
  *  Returns the max number of elements this typed array instance can accommodate.
@@ -729,4 +770,5 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "plus", rb_type_array_plus, 2);
     rb_define_method(rb_cTypeArray, "minus", rb_type_array_minus, 2);
     rb_define_method(rb_cTypeArray, "div", rb_type_array_div, 2);
+    rb_define_method(rb_cTypeArray, "eql", rb_type_array_eql, 2);
 }
