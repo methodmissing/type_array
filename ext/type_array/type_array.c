@@ -27,14 +27,14 @@ static ID rb_type_array_intern_aset;
  *  Coerces a Ruby object to an int8 at a given offset, according to host endianness.
  *
 */
-DefineTypeArraySetter(int8, (char)NUM2CHR(item));
+DefineTypeArraySetter(int8, (signed char)NUM2CHR(item));
 
 /*
  * :nodoc:
  *  Coerces an int8 at a given offset to a Ruby object, according to host endianness.
  *
 */
-DefineTypeArrayGetter(int8, char, CHR2FIX(val));
+DefineTypeArrayGetter(int8, signed char, TACHR2FIX(val));
 
 /*
  * :nodoc:
@@ -48,7 +48,7 @@ DefineTypeArraySetter(uint8, (unsigned char)NUM2CHR(item));
  *  Coerces an unsigned int8 at a given offset to a Ruby object, according to host endianness.
  *
 */
-DefineTypeArrayGetter(uint8, unsigned char, CHR2FIX(val));
+DefineTypeArrayGetter(uint8, unsigned char, TACHR2FIX(val));
 
 /*
  * :nodoc:

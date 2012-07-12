@@ -4,7 +4,7 @@
 rb_encoding *binary_encoding;
 #endif
 
-DefineTypeAccessor(int8, char);
+DefineTypeAccessor(int8, signed char);
 DefineTypeAccessor(uint8, unsigned char);
 DefineTypeAccessor(int16, short);
 DefineTypeAccessor(uint16, unsigned short);

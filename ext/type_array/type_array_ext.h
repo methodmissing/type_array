@@ -18,7 +18,11 @@ extern VALUE rb_cUInt64Array;
 
 extern VALUE rb_cDataView;
 
-void rb_type_array_set_int8(void *abuf, unsigned long index, char val, VALUE swiz);
+/* Special case overrides as the Ruby specific implementations casts to long (thx James Tucker) */
+#define TAINT2FIX(i) ((VALUE)(((char)(i))<<1 | FIXNUM_FLAG))
+#define TACHR2FIX(x) TAINT2FIX((char)((x)&0xff))
+
+void rb_type_array_set_int8(void *abuf, unsigned long index, signed char val, VALUE swiz);
 void rb_type_array_set_uint8(void *abuf, unsigned long index, unsigned char val, VALUE swiz);
 void rb_type_array_set_int16(void *abuf, unsigned long index, short val, VALUE swiz);
 void rb_type_array_set_uint16(void *abuf, unsigned long index, unsigned short val, VALUE swiz);
@@ -27,7 +31,7 @@ void rb_type_array_set_uint32(void *abuf, unsigned long index, unsigned int val,
 void rb_type_array_set_float32(void *abuf, unsigned long index, float val, VALUE swiz);
 void rb_type_array_set_float64(void *abuf, unsigned long index, double val, VALUE swiz);
 
-char rb_type_array_get_int8(void *abuf, unsigned long index, VALUE swiz);
+signed char rb_type_array_get_int8(void *abuf, unsigned long index, VALUE swiz);
 unsigned char rb_type_array_get_uint8(void *abuf, unsigned long index, VALUE swiz);
 short rb_type_array_get_int16(void *abuf, unsigned long index, VALUE swiz);
 unsigned short rb_type_array_get_uint16(void *abuf, unsigned long index, VALUE swiz);

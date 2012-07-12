@@ -216,7 +216,7 @@ static VALUE rb_data_view_get_int8(VALUE obj, VALUE offset_)
     argv[0] = offset_;
     argv[1] = Qfalse;
     DataViewAget(obj);
-    return CHR2FIX(rb_type_array_get_int8(buf->buf, index, little_endian));
+    return TACHR2FIX(rb_type_array_get_int8(buf->buf, index, little_endian));
 }
 
 /*
@@ -265,7 +265,7 @@ static VALUE rb_data_view_get_uint8(VALUE obj, VALUE offset_)
     argv[0] = offset_;
     argv[1] = Qfalse;
     DataViewAget(obj);
-    return CHR2FIX(rb_type_array_get_uint8(buf->buf, index, little_endian));
+    return TACHR2FIX(rb_type_array_get_uint8(buf->buf, index, little_endian));
 }
 
 /*

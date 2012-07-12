@@ -89,7 +89,7 @@ class TestTypeArray < TypeArrayTestCase
 
     ary2 = Int8Array.new(ary)
     assert_equal 100, ary2[0]
-    assert_equal 200, ary2[1]
+    assert_equal -56, ary2[1]
     assert_equal 44, ary2[2]
   end
 

@@ -28,6 +28,6 @@ class TestUInt8Array < TypeArrayTestCase
     assert_equal 5, ary[0]
     assert_equal 0, ary[1]
     assert_equal 0, ary[7]
-    assert_equal(251, ary[3])
+    assert_equal(-5, ary[3])
   end
 end
