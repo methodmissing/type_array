@@ -255,4 +255,22 @@ class TestTypeArray < TypeArrayTestCase
     assert_equal [2, 4, 8, 16], vals
     assert_equal %w(2 4 8 16), ary.map(&:to_s)
   end
+
+  def test_marshal
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 8
+    ary[3] = 16
+
+    serialized = "\x04\bu:\x0FInt32Array\x15\x00\x00\x00\x02\x00\x00\x00\x04\x00\x00\x00\b\x00\x00\x00\x10"
+    assert_equal serialized, Marshal.dump(ary)
+
+    ary = Marshal.load(serialized)
+    assert_instance_of Int32Array, ary
+    assert_equal 2, ary[0]
+    assert_equal 16, ary[3]
+  end
 end

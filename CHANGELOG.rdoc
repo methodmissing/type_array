@@ -1,5 +1,10 @@
 = Changelog
 
+== 0.3.0 (July 18th, 2012)
+* Introduce support for setting operator results at a given offset without coercion to a Ruby object
+* Let TypeArray be enumerable as well
+* Support Marshal dump / load
+
 == 0.2.0 (July 12th, 2012)
 * Introduce support for lower level comparison at given offsets (avoids excess Ruby object allocations)
 * Introduce support for lower level math operations at given offsets (avoids excess Ruby object allocations)

@@ -130,7 +130,6 @@ Running tests
 
 == Todo
 
-* Support Marshal dump / load
 * Support structs / records
 * Handle edges where coercion to and from Bignum is more appropriate
 

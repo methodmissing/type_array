@@ -66,6 +66,17 @@ class TestArrayBuffer < TypeArrayTestCase
     assert str.frozen?
   end
 
+  def test_marshal
+    buf = ArrayBuffer.new(4)
+    assert_equal "\x00\x00\x00\x00", buf.to_s
+
+    serialized = "\x04\bu:\x10ArrayBuffer\t\x00\x00\x00\x00"
+    assert_equal serialized, Marshal.dump(buf)
+
+    buf = Marshal.load(serialized)
+    assert_equal "\x00\x00\x00\x00", buf.to_s
+  end
+
   def test_io
     buf = ArrayBuffer.new(16)
 

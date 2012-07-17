@@ -69,6 +69,22 @@ class TestDataView < TypeArrayTestCase
     assert str.frozen?
   end
 
+  def test_marshal
+    buf = ArrayBuffer.new(4)
+
+    view = DataView.new(buf)
+    view.set_int8(1, 5)
+    view.set_int16(3, 7)
+
+    serialized = "\x04\bu:\rDataView\t\x00\x05\x00\a"
+    assert_equal serialized, Marshal.dump(view)
+
+    view = Marshal.load(serialized)
+    assert_instance_of DataView, view
+    assert_equal 5, view.get_int8(1)
+    assert_equal 7, view.get_int8(3)
+  end
+
   def test_int8
     buf = ArrayBuffer.new(100)
 
