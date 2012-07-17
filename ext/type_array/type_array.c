@@ -237,7 +237,8 @@ DefineTypeArrayOperator(eql, ==, float64, double, (val == 0 ? Qfalse : Qtrue));
  *  Asserts type alignment.
  *
 */
-inline int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes) {
+inline int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes)
+{
     return (val & (bytes - 1)) == 0 ? 1 : 0;
 }
 
@@ -246,7 +247,8 @@ inline int rb_type_array_assert_alignment(unsigned long val, unsigned long bytes
  *  Swizzles byte order.
  *
 */
-inline void rb_type_array_swizzle(char* buf, unsigned long len) {
+inline void rb_type_array_swizzle(char* buf, unsigned long len)
+{
     unsigned long i;
     for (i = 0; i < len / 2; ++i) {
       char t = buf[i];
@@ -257,19 +259,28 @@ inline void rb_type_array_swizzle(char* buf, unsigned long len) {
 
 /*
  * :nodoc:
- *  Validates offset boundaries.
+ *  Validates offset boundaries (no index coercion)
  *
 */
-static inline long rb_type_array_assert_offset(rb_type_array_t *ary, VALUE idx)
+static inline long rb_type_array_assert_offset0(rb_type_array_t *ary, long idx)
 {
-    long index;
-    Check_Type(idx, T_FIXNUM);
-    index = FIX2LONG(idx) * ary->size;
+    long index = idx * ary->size;
     if (index < 0) rb_raise(rb_eRangeError, "Offset may not be negative.");
     if (!rb_type_array_assert_alignment(index, ary->size)) rb_raise(rb_eRangeError, "Byte offset is not aligned.");
     if ((unsigned long)index > ary->byte_length) rb_raise(rb_eRangeError, "Offset out of range.");
     if (ary->size > (ary->byte_length - (unsigned long)index)) rb_raise(rb_eRangeError, "Offset/length out of range.");
     return index;
+}
+
+/*
+ * :nodoc:
+ *  Validates offset boundaries.
+ *
+*/
+static inline long rb_type_array_assert_offset(rb_type_array_t *ary, VALUE idx)
+{
+    Check_Type(idx, T_FIXNUM);
+    return rb_type_array_assert_offset0(ary, FIX2LONG(idx));
 }
 
 /*
@@ -744,9 +755,41 @@ static VALUE rb_type_array_aget(VALUE obj, VALUE idx)
     return ary->aref_fn(buf->buf, index);
 }
 
+/*
+ *  call-seq:
+ *     type_array.each {|item| block }   =>  TypeArray
+ *
+ *  Calls <i>block</i> once for each element in <i>self</i>, passing that element as a parameter.
+ *
+ * === Examples
+ *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
+ *
+ *     ary = Int32Array.new(buf)         =>  Int32Array
+ *     ary[0] = 2                        =>  nil
+ *     ary[1] = 4                        =>  nil
+ *     ary[2] = 8                        =>  nil
+ *     ary[3] = 16                       =>  nil
+ *
+ *     ary.map(&:to_s)                   =>  %w(2 4 8 16)
+ *
+*/
+static VALUE rb_type_array_each(VALUE obj)
+{
+    long index;
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+
+    RETURN_ENUMERATOR(obj, 0, 0);
+    for (index = 0; index < ary->length; index++) {
+        rb_yield(ary->aref_fn(buf->buf, (index * ary->size)));
+    }
+    return obj;
+}
+
 void _init_type_array()
 {
     rb_cTypeArray = rb_define_class("TypeArray", rb_cObject);
+    rb_include_module(rb_cTypeArray, rb_mEnumerable);
 
     rb_type_array_intern_aget = rb_intern("[]");
     rb_type_array_intern_aset = rb_intern("[]=");
@@ -783,4 +826,5 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "minus", rb_type_array_minus, -1);
     rb_define_method(rb_cTypeArray, "div", rb_type_array_div, -1);
     rb_define_method(rb_cTypeArray, "eql", rb_type_array_eql, 2);
+    rb_define_method(rb_cTypeArray, "each", rb_type_array_each, 0);
 }

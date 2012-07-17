@@ -237,4 +237,22 @@ class TestTypeArray < TypeArrayTestCase
     assert ary.eql(0,1)
     assert !ary.eql(1,2)
   end
+
+  def test_each
+    buf = ArrayBuffer.new(16)
+
+    ary = Int32Array.new(buf)
+    ary[0] = 2
+    ary[1] = 4
+    ary[2] = 8
+    ary[3] = 16
+
+    vals = []
+    assert_equal ary, ary.each{|v| vals << v }
+    assert_instance_of Enumerator, ary.each
+    assert_instance_of Enumerator, ary.map
+
+    assert_equal [2, 4, 8, 16], vals
+    assert_equal %w(2 4 8 16), ary.map(&:to_s)
+  end
 end
