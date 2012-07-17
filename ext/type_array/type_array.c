@@ -502,13 +502,16 @@ static VALUE rb_type_array_byte_length(VALUE obj)
  *     ary.mul(0,1)                      =>  8
  *     ary.mul(1,2)                      =>  32
 */
-static VALUE rb_type_array_mul(VALUE obj, VALUE off1, VALUE off2)
+static VALUE rb_type_array_mul(int argc, VALUE *argv, VALUE obj)
 {
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->mul_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->mul_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -527,13 +530,16 @@ static VALUE rb_type_array_mul(VALUE obj, VALUE off1, VALUE off2)
  *     ary.plus(0,1)                     =>  6
  *     ary.plus(1,2)                     =>  12
 */
-static VALUE rb_type_array_plus(VALUE obj, VALUE off1, VALUE off2)
+static VALUE rb_type_array_plus(int argc, VALUE *argv, VALUE obj)
 {
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->plus_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->plus_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -552,13 +558,16 @@ static VALUE rb_type_array_plus(VALUE obj, VALUE off1, VALUE off2)
  *     ary.minus(1, 0)                   =>  2
  *     ary.minus(2, 1)                   =>  4
 */
-static VALUE rb_type_array_minus(VALUE obj, VALUE off1, VALUE off2)
+static VALUE rb_type_array_minus(int argc, VALUE *argv, VALUE obj)
 {
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->minus_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->minus_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -577,20 +586,23 @@ static VALUE rb_type_array_minus(VALUE obj, VALUE off1, VALUE off2)
  *     ary.div(1, 0)                     =>  2
  *     ary.div(2, 1)                     =>  2
 */
-static VALUE rb_type_array_div(VALUE obj, VALUE off1, VALUE off2)
+static VALUE rb_type_array_div(int argc, VALUE *argv, VALUE obj)
 {
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->div_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->div_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
  *  call-seq:
- *     ary.div(0,1)                      =>  Fixnum, Bignum or Float
+ *     ary.eql(0,1)                      =>  true or fales
  *
- *  Gets two values at given offsets and divides them - only the result's coerced to a Ruby object.
+ *  Gets two values at given offsets and compares them - a boolean's returned
  *
  * === Examples
  *     buf = ArrayBuffer.new(16)         =>  ArrayBuffer
@@ -599,8 +611,8 @@ static VALUE rb_type_array_div(VALUE obj, VALUE off1, VALUE off2)
  *     ary[1] = 4                        =>  nil
  *     ary[2] = 8                        =>  nil
  *
- *     ary.div(1, 0)                     =>  2
- *     ary.div(2, 1)                     =>  2
+ *     ary.eql(1, 0)                     =>  false
+ *     ary.eql(2, 2)                     =>  true
 */
 static VALUE rb_type_array_eql(VALUE obj, VALUE off1, VALUE off2)
 {
@@ -608,7 +620,7 @@ static VALUE rb_type_array_eql(VALUE obj, VALUE off1, VALUE off2)
     GetArrayBuffer(ary->buf);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->eql_fn(buf->buf, offset1, offset2);
+    return ary->eql_fn(buf->buf, offset1, offset2, 0);
 }
 
 /*
@@ -766,9 +778,9 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "to_s", rb_type_array_to_s, 0);
     rb_define_method(rb_cTypeArray, "[]=", rb_type_array_aset, 2);
     rb_define_method(rb_cTypeArray, "[]", rb_type_array_aget, 1);
-    rb_define_method(rb_cTypeArray, "mul", rb_type_array_mul, 2);
-    rb_define_method(rb_cTypeArray, "plus", rb_type_array_plus, 2);
-    rb_define_method(rb_cTypeArray, "minus", rb_type_array_minus, 2);
-    rb_define_method(rb_cTypeArray, "div", rb_type_array_div, 2);
+    rb_define_method(rb_cTypeArray, "mul", rb_type_array_mul, -1);
+    rb_define_method(rb_cTypeArray, "plus", rb_type_array_plus, -1);
+    rb_define_method(rb_cTypeArray, "minus", rb_type_array_minus, -1);
+    rb_define_method(rb_cTypeArray, "div", rb_type_array_div, -1);
     rb_define_method(rb_cTypeArray, "eql", rb_type_array_eql, 2);
 }
