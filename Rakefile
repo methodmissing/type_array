@@ -6,6 +6,7 @@ require 'rake' unless defined?(Rake)
 # Prefer compiled Rubinius bytecode in .rbx/
 ENV["RBXOPT"] = "-Xrbc.db"
 
+ENV["RUBY_CC_VERSION"] = "1.8.7:1.9.2:1.9.3"
 require 'rake/extensiontask'
 require 'rake/testtask'
 
@@ -21,8 +22,13 @@ Gem::PackageTask.new(gemspec) do |pkg|
 end
 
 Rake::ExtensionTask.new('type_array', gemspec) do |ext|
+  ext.cross_compile = true
   ext.name = 'type_array_ext'
   ext.ext_dir = 'ext/type_array'
+
+  ext.cross_compiling do |gem_spec|
+    gem_spec.post_install_message = "You installed the binary version of this gem!"
+  end
 
   CLEAN.include 'lib/**/type_array_ext.*'
 end
