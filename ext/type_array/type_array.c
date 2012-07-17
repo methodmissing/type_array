@@ -504,13 +504,14 @@ static VALUE rb_type_array_byte_length(VALUE obj)
 */
 static VALUE rb_type_array_mul(int argc, VALUE *argv, VALUE obj)
 {
-    VALUE off1, off2;
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    rb_scan_args(argc, argv, "2", &off1, &off2);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->mul_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->mul_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -531,13 +532,14 @@ static VALUE rb_type_array_mul(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_type_array_plus(int argc, VALUE *argv, VALUE obj)
 {
-    VALUE off1, off2;
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    rb_scan_args(argc, argv, "2", &off1, &off2);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->plus_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->plus_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -558,13 +560,14 @@ static VALUE rb_type_array_plus(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_type_array_minus(int argc, VALUE *argv, VALUE obj)
 {
-    VALUE off1, off2;
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    rb_scan_args(argc, argv, "2", &off1, &off2);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->minus_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->minus_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -585,13 +588,14 @@ static VALUE rb_type_array_minus(int argc, VALUE *argv, VALUE obj)
 */
 static VALUE rb_type_array_div(int argc, VALUE *argv, VALUE obj)
 {
-    VALUE off1, off2;
+    VALUE off1, off2, off3;
     GetTypeArray(obj);
     GetArrayBuffer(ary->buf);
-    rb_scan_args(argc, argv, "2", &off1, &off2);
+    rb_scan_args(argc, argv, "21", &off1, &off2, &off3);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->div_fn(buf->buf, offset1, offset2);
+    long offset3 = NIL_P(off3) ? 0 : rb_type_array_assert_offset(ary, off3);
+    return ary->div_fn(buf->buf, offset1, offset2, offset3);
 }
 
 /*
@@ -616,7 +620,7 @@ static VALUE rb_type_array_eql(VALUE obj, VALUE off1, VALUE off2)
     GetArrayBuffer(ary->buf);
     long offset1 = rb_type_array_assert_offset(ary, off1);
     long offset2 = rb_type_array_assert_offset(ary, off2);
-    return ary->eql_fn(buf->buf, offset1, offset2);
+    return ary->eql_fn(buf->buf, offset1, offset2, 0);
 }
 
 /*

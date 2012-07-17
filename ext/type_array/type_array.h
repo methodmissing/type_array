@@ -3,7 +3,7 @@
 
 typedef void (type_array_aset_fn) (rb_array_buffer_t *buf, long index, VALUE item);
 typedef VALUE (type_array_aref_fn) (rb_array_buffer_t *buf, long index);
-typedef VALUE (type_array_operator_fn) (rb_array_buffer_t *buf, long off1, long off2);
+typedef VALUE (type_array_operator_fn) (rb_array_buffer_t *buf, long off1, long off2, long off3);
 
 typedef struct {
     unsigned long size;
@@ -48,13 +48,18 @@ void _init_type_array();
     DefineTypeArrayOperator(div, /, name, type, coercion); \
 
 #define DefineTypeArrayOperator(op_name, op, name, type, coercion) \
-    VALUE rb_type_array_##op_name##_##name(rb_array_buffer_t *buf, long off1, long off2) \
+    VALUE rb_type_array_##op_name##_##name(rb_array_buffer_t *buf, long off1, long off2, long off3) \
     { \
         type val; \
         type val1 = rb_type_array_get_##name(buf, off1, TYPE_ARRAY_IS_LITTLE_ENDIAN); \
         type val2 = rb_type_array_get_##name(buf, off2, TYPE_ARRAY_IS_LITTLE_ENDIAN); \
         val = val1 op val2; \
-        return coercion; \
+        if (off3 != 0) { \
+            rb_type_array_set_##name(buf, off3, val, TYPE_ARRAY_IS_LITTLE_ENDIAN); \
+            return Qnil; \
+        } else { \
+            return coercion; \
+        } \
     }
 
 #endif

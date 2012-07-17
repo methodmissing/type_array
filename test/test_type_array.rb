@@ -89,7 +89,7 @@ class TestTypeArray < TypeArrayTestCase
 
     ary2 = Int8Array.new(ary)
     assert_equal 100, ary2[0]
-    assert_equal -56, ary2[1]
+    assert_equal(-56, ary2[1])
     assert_equal 44, ary2[2]
   end
 
@@ -163,6 +163,9 @@ class TestTypeArray < TypeArrayTestCase
 
     assert_equal 8, ary.mul(0,1)
     assert_equal 32, ary.mul(1, 2)
+
+    ary.mul(0, 1, 3)
+    assert_equal 8, ary[3]
   end
 
   def test_plus
@@ -175,6 +178,9 @@ class TestTypeArray < TypeArrayTestCase
 
     assert_equal 6, ary.plus(0,1)
     assert_equal 12, ary.plus(1, 2)
+
+    ary.plus(1, 2, 3)
+    assert_equal 12, ary[3]
   end
 
   def test_minus
@@ -187,6 +193,9 @@ class TestTypeArray < TypeArrayTestCase
 
     assert_equal 2, ary.minus(1,0)
     assert_equal 4, ary.minus(2, 1)
+
+    ary.minus(2, 1, 3)
+    assert_equal 4, ary[3]
   end
 
   def test_div
@@ -199,6 +208,9 @@ class TestTypeArray < TypeArrayTestCase
 
     assert_equal 2, ary.div(1,0)
     assert_equal 2, ary.div(2, 1)
+
+    ary.div(2, 1, 3)
+    assert_equal 2, ary[3]
   end
 
   def test_eql
