@@ -249,8 +249,6 @@ class TestTypeArray < TypeArrayTestCase
 
     vals = []
     assert_equal ary, ary.each{|v| vals << v }
-    assert_instance_of Enumerator, ary.each
-    assert_instance_of Enumerator, ary.map
 
     assert_equal [2, 4, 8, 16], vals
     assert_equal %w(2 4 8 16), ary.map(&:to_s)
