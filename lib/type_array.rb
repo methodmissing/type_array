@@ -6,6 +6,7 @@ ENV["RBXOPT"] = "-Xrbc.db"
 require "type_array_ext"
 
 require 'type_array/version' unless defined? TypeArray::VERSION
+require 'struct_type'
 require 'type_array/io'
 require 'type_array/marshal'
 

@@ -15,8 +15,10 @@ extern VALUE rb_cInt32Array;
 extern VALUE rb_cUInt32Array;
 extern VALUE rb_cInt64Array;
 extern VALUE rb_cUInt64Array;
+extern VALUE rb_cStructArray;
 
 extern VALUE rb_cDataView;
+extern VALUE rb_cStructType;
 
 /* Special case overrides as the Ruby specific implementations casts to long (thx James Tucker) */
 #define TAINT2FIX(i) ((VALUE)(((char)(i))<<1 | FIXNUM_FLAG))
@@ -30,6 +32,7 @@ void rb_type_array_set_int32(void *abuf, unsigned long index, int val, VALUE swi
 void rb_type_array_set_uint32(void *abuf, unsigned long index, unsigned int val, VALUE swiz);
 void rb_type_array_set_float32(void *abuf, unsigned long index, float val, VALUE swiz);
 void rb_type_array_set_float64(void *abuf, unsigned long index, double val, VALUE swiz);
+void rb_type_array_set_struct(void *abuf, unsigned long index, VALUE val, VALUE swiz);
 
 signed char rb_type_array_get_int8(void *abuf, unsigned long index, VALUE swiz);
 unsigned char rb_type_array_get_uint8(void *abuf, unsigned long index, VALUE swiz);
@@ -39,6 +42,7 @@ int rb_type_array_get_int32(void *abuf, unsigned long index, VALUE swiz);
 unsigned int rb_type_array_get_uint32(void *abuf, unsigned long index, VALUE swiz);
 float rb_type_array_get_float32(void *abuf, unsigned long index, VALUE swiz);
 double rb_type_array_get_float64(void *abuf, unsigned long index, VALUE swiz);
+VALUE rb_type_array_get_struct(void *abuf, unsigned long index, VALUE swiz);
 
 #define DefineTypeGetter(name, type) \
     inline type rb_type_array_get_##name(void *abuf, unsigned long index, VALUE swiz) \

@@ -18,9 +18,13 @@ VALUE rb_cInt32Array;
 VALUE rb_cUInt32Array;
 VALUE rb_cFloat32Array;
 VALUE rb_cFloat64Array;
+VALUE rb_cStructArray;
+
+VALUE rb_cStructType;
 
 static ID rb_type_array_intern_aget;
 static ID rb_type_array_intern_aset;
+static ID rb_type_array_intern_superclass;
 
 /*
  * :nodoc:
@@ -232,6 +236,15 @@ DefineTypeArrayGetter(float64, double, rb_float_new(val));
 DefineTypeArrayOperators(float64, double, rb_float_new(val));
 DefineTypeArrayOperator(eql, ==, float64, double, (val == 0 ? Qfalse : Qtrue));
 
+void rb_type_array_aset_struct(rb_array_buffer_t *buf, long index, VALUE item)
+{
+}
+
+VALUE rb_type_array_aref_struct(rb_array_buffer_t *buf, long index)
+{
+    return Qnil;
+}
+
 /*
  * :nodoc:
  *  Asserts type alignment.
@@ -291,7 +304,10 @@ static inline long rb_type_array_assert_offset(rb_type_array_t *ary, VALUE idx)
 static void rb_mark_type_array(void *ptr)
 {
     rb_type_array_t *ary = (rb_type_array_t *)ptr;
-    if (ary) rb_gc_mark(ary->buf);
+    if (ary) {
+        rb_gc_mark(ary->struct_type);
+        rb_gc_mark(ary->buf);
+    }
 }
 
 /*
@@ -359,7 +375,9 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
     if (klass == rb_cTypeArray) rb_raise(rb_eTypeError, "TypeArray cannot be instantiated directly.");
     rb_scan_args(argc, argv, "12", &obj, &byte_offset, &length);
     type_array = Data_Make_Struct(klass, rb_type_array_t, rb_mark_type_array, rb_free_type_array, array);
-    array->size = FIX2ULONG(rb_const_get(klass, rb_intern("BYTES_PER_ELEMENT")));
+    if (klass != rb_cStructArray) {
+        array->size = FIX2ULONG(rb_const_get(klass, rb_intern("BYTES_PER_ELEMENT")));
+    }
     array->byte_offset = 0;
     array->length = 0;
 
@@ -427,6 +445,9 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
         array->minus_fn = rb_type_array_minus_float64;
         array->div_fn = rb_type_array_div_float64;
         array->eql_fn = rb_type_array_eql_float64;
+    } else if (klass == rb_cStructArray) {
+        array->aref_fn = rb_type_array_aref_struct;
+        array->aset_fn = rb_type_array_aset_struct;
     }
 
     if (FIXNUM_P(obj)) {
@@ -473,11 +494,34 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
           VALUE val = rb_funcall(obj, rb_type_array_intern_aget, 1, offs);
           rb_funcall(type_array, rb_type_array_intern_aset, 2, offs, val);
         }
+    } else if (rb_respond_to(obj, rb_type_array_intern_superclass) && (rb_funcall(obj, rb_type_array_intern_superclass, 0) == rb_cStructType)) {
+        array->size = FIX2ULONG(rb_const_get(obj, rb_intern("BYTES_PER_ELEMENT")));
+        if (!NIL_P(byte_offset)) {
+            Check_Type(byte_offset, T_FIXNUM);
+            array->byte_offset = FIX2ULONG(byte_offset);
+            if (!rb_type_array_assert_alignment(array->byte_offset, array->size))
+                rb_raise(rb_eRangeError, "Byte offset is not aligned.");
+        }
+        if (!NIL_P(length)) {
+            Check_Type(length, T_FIXNUM);
+            array->length = FIX2ULONG(length);
+        } else {
+            array->length = 1;
+        }
+        array->byte_length = (array->size * array->length);
+        array->buf = rb_alloc_array_buffer(array->byte_length, NULL);
     } else {
         rb_raise(rb_eTypeError, "TypeArray constructor %s not supported.", RSTRING_PTR(rb_obj_as_string(obj)));
     }
     rb_obj_call_init(type_array, 0, NULL);
     return type_array;
+}
+
+static VALUE rb_struct_array_s_new(int argc, VALUE *argv, VALUE klass)
+{
+    VALUE struct_array = rb_type_array_s_new(argc, argv, klass);
+    GetTypeArray(struct_array);
+    return struct_array;
 }
 
 /*
@@ -793,6 +837,7 @@ void _init_type_array()
 
     rb_type_array_intern_aget = rb_intern("[]");
     rb_type_array_intern_aset = rb_intern("[]=");
+    rb_type_array_intern_superclass = rb_intern("superclass");
 
     rb_cInt8Array = rb_define_class("Int8Array", rb_cTypeArray);
     rb_cUInt8Array = rb_define_class("UInt8Array", rb_cTypeArray);
@@ -802,6 +847,7 @@ void _init_type_array()
     rb_cUInt32Array = rb_define_class("UInt32Array", rb_cTypeArray);
     rb_cFloat32Array = rb_define_class("Float32Array", rb_cTypeArray);
     rb_cFloat64Array = rb_define_class("Float64Array", rb_cTypeArray);
+    rb_cStructArray = rb_define_class("StructArray", rb_cTypeArray);
 
     rb_define_const(rb_cInt8Array, "BYTES_PER_ELEMENT", ULONG2NUM(sizeof(signed char)));
     rb_define_const(rb_cUInt8Array, "BYTES_PER_ELEMENT", ULONG2NUM(sizeof(unsigned char)));
@@ -811,8 +857,13 @@ void _init_type_array()
     rb_define_const(rb_cUInt32Array, "BYTES_PER_ELEMENT", ULONG2NUM(sizeof(unsigned int)));
     rb_define_const(rb_cFloat32Array, "BYTES_PER_ELEMENT", ULONG2NUM(sizeof(float)));
     rb_define_const(rb_cFloat64Array, "BYTES_PER_ELEMENT", ULONG2NUM(sizeof(double)));
+    rb_define_const(rb_cStructArray, "BYTES_PER_ELEMENT", INT2NUM(0));
+
+    rb_require("struct_type");
+    rb_cStructType = rb_const_get(rb_cObject, rb_intern("StructType"));
 
     rb_define_singleton_method(rb_cTypeArray, "new", rb_type_array_s_new, -1);
+    rb_define_singleton_method(rb_cStructArray, "new", rb_struct_array_s_new, -1);
 
     rb_define_method(rb_cTypeArray, "byte_length", rb_type_array_byte_length, 0);
     rb_define_method(rb_cTypeArray, "length", rb_type_array_length, 0);
@@ -827,4 +878,10 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "div", rb_type_array_div, -1);
     rb_define_method(rb_cTypeArray, "eql", rb_type_array_eql, 2);
     rb_define_method(rb_cTypeArray, "each", rb_type_array_each, 0);
+
+    rb_undef(rb_cStructArray, rb_intern("mul"));
+    rb_undef(rb_cStructArray, rb_intern("plus"));
+    rb_undef(rb_cStructArray, rb_intern("minus"));
+    rb_undef(rb_cStructArray, rb_intern("div"));
+    rb_undef(rb_cStructArray, rb_intern("eql"));
 }

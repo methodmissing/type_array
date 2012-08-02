@@ -17,6 +17,7 @@ typedef struct {
     type_array_operator_fn *minus_fn;
     type_array_operator_fn *div_fn;
     type_array_operator_fn *eql_fn;
+    VALUE struct_type;
     VALUE buf;
 } rb_type_array_t;
 
