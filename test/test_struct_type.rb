@@ -15,7 +15,7 @@ class TestStructTpe< TypeArrayTestCase
 
   def test_members
     r = SomeRecord.new
-    assert_equal %w(a b), r.members
+    assert_equal %w(a b), r.members.map(&:to_s)
   end
 
   def test_size
