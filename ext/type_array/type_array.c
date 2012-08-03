@@ -495,6 +495,7 @@ static VALUE rb_type_array_s_new(int argc, VALUE *argv, VALUE klass)
           rb_funcall(type_array, rb_type_array_intern_aset, 2, offs, val);
         }
     } else if (rb_respond_to(obj, rb_type_array_intern_superclass) && (rb_funcall(obj, rb_type_array_intern_superclass, 0) == rb_cStructType)) {
+        array->struct_type = obj;
         array->size = FIX2ULONG(rb_const_get(obj, rb_intern("BYTES_PER_ELEMENT")));
         if (!NIL_P(byte_offset)) {
             Check_Type(byte_offset, T_FIXNUM);
@@ -830,6 +831,26 @@ static VALUE rb_type_array_each(VALUE obj)
     return obj;
 }
 
+/*
+ *  call-seq:
+ *     struct_array.struct_type            =>  StructType
+ *
+ *  Returns the type of structure this StructArray 
+ *
+ * === Examples
+ *     ary = StructArray.new(OtherRecord)  =>  StructArray
+ *
+ *     ary.struct_type                     =>  OtherRecord
+ *
+*/
+static VALUE rb_type_array_struct_type(VALUE obj)
+{
+    GetTypeArray(obj);
+    GetArrayBuffer(ary->buf);
+
+    return ary->struct_type;
+}
+
 void _init_type_array()
 {
     rb_cTypeArray = rb_define_class("TypeArray", rb_cObject);
@@ -879,6 +900,7 @@ void _init_type_array()
     rb_define_method(rb_cTypeArray, "eql", rb_type_array_eql, 2);
     rb_define_method(rb_cTypeArray, "each", rb_type_array_each, 0);
 
+    rb_define_method(rb_cStructArray, "struct_type", rb_type_array_struct_type, 0);
     rb_undef(rb_cStructArray, rb_intern("mul"));
     rb_undef(rb_cStructArray, rb_intern("plus"));
     rb_undef(rb_cStructArray, rb_intern("minus"));

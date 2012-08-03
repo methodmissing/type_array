@@ -26,4 +26,9 @@ class TestStructArray < TypeArrayTestCase
       ary.mul(1,2)
     end
   end
+
+  def struct_type
+    ary = StructArray.new(OtherRecord, 0, 10)
+    assert_equal OtherRecord, ary.struct_type
+  end
 end
